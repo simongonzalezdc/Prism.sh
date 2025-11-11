@@ -14,9 +14,9 @@
 | **Ctrl+H** | Help |
 | **Ctrl+Shift+T** | Switch theme |
 | **Ctrl+S** | Manual save |
-| **Ctrl+Z** | Undo |
-| **Ctrl+Y** | Redo |
 | **Esc** | Back/Cancel |
+
+**Note:** Undo/Redo (Ctrl+Z/Ctrl+Y) is planned for v2.0+ and not required for v1.0 releases.
 
 ---
 
@@ -156,10 +156,36 @@ func (m RootModel) View() string {
 
 ## Configuration Management
 
-### Config File Location
+### Config File Location (Cross-Platform)
 
+**Linux:**
 ```
 ~/.config/{tool}/config.toml
+```
+
+**macOS:**
+```
+~/Library/Application Support/{tool}/config.toml
+```
+
+**Windows:**
+```
+%APPDATA%/{tool}/config.toml
+```
+
+**Implementation:**
+```go
+import "os"
+
+func GetConfigDir(tool string) string {
+    configDir, err := os.UserConfigDir()
+    if err != nil {
+        // Fallback to home directory
+        homeDir, _ := os.UserHomeDir()
+        return filepath.Join(homeDir, ".config", tool)
+    }
+    return filepath.Join(configDir, tool)
+}
 ```
 
 ### Standard Config Structure
@@ -198,12 +224,32 @@ func LoadConfig(tool string) (Config, error) {
 
 ### Principle
 
-Use XDG Base Directory spec:
+Use XDG Base Directory spec (with cross-platform support):
 
+**Linux (XDG):**
 ```
 ~/.config/{tool}/         (Config)
 ~/.local/share/{tool}/    (Data)
 ~/.cache/{tool}/          (Temporary)
+```
+
+**macOS:**
+```
+~/Library/Application Support/{tool}/  (Config & Data)
+~/Library/Caches/{tool}/               (Temporary)
+```
+
+**Windows:**
+```
+%APPDATA%/{tool}/          (Config & Data)
+%LOCALAPPDATA%/{tool}/     (Temporary)
+```
+
+**Go Implementation:**
+```go
+// Use os.UserConfigDir() for config
+// Use os.UserCacheDir() for cache
+// Create custom function for data directory
 ```
 
 ### Storage Layer Example
@@ -294,9 +340,9 @@ go test -run TestName ./...
 |-----------|--------|------|
 | Startup | <1s | Only initialize essentials |
 | Keystroke | <100ms | No heavy compute in View() |
-| Save | <100ms | Make non-blocking async |
+| Save | <100ms | Use atomic writes, make async if needed |
 | Search | <100ms | Index or cache results |
-| Memory | <50MB | Profile with pprof |
+| Memory (idle) | <50MB | Profile with pprof |
 
 ### Common Optimizations
 
@@ -479,13 +525,14 @@ MIT
 - [ ] All core features implemented
 - [ ] All acceptance criteria met
 - [ ] 0 critical bugs
-- [ ] 10 themes working
-- [ ] Universal shortcuts working
-- [ ] Performance targets met
+- [ ] 10 themes working (for app UI styling)
+- [ ] Universal shortcuts working (Ctrl+Q, Ctrl+H, Ctrl+Shift+T, Ctrl+S, Esc)
+- [ ] Performance targets met (startup <1s, operations <500ms, memory <50MB)
 - [ ] All tests passing (>70% coverage)
-- [ ] Documentation complete
-- [ ] Works on 80x24 terminal
-- [ ] No panics or crashes
+- [ ] Documentation complete (README, ARCHITECTURE, CONTRIBUTING, LICENSE)
+- [ ] Functional UI in 80x24 terminal minimum
+- [ ] No panics in application code (all external panics recovered gracefully)
+- [ ] Cross-platform support (Linux, macOS, Windows)
 
 ### GitHub Release
 
@@ -496,6 +543,78 @@ git push origin v1.0
 
 # Create release on GitHub
 # Upload binaries for multiple platforms
+```
+
+---
+
+## CI/CD Best Practices
+
+### Required GitHub Actions
+
+All Kyanite tools should include:
+
+1. **Test workflow** - Run tests on every push/PR
+2. **Build workflow** - Build for Linux, macOS, Windows (amd64 & arm64)
+3. **Release workflow** - Automated releases on version tags
+
+### Example Workflows Directory Structure
+
+```
+.github/
+└── workflows/
+    ├── test.yml       (Tests + coverage check)
+    ├── build.yml      (Multi-platform builds)
+    └── release.yml    (Create GitHub releases)
+```
+
+### Test Workflow Template
+
+```yaml
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - run: go test -v -race -coverprofile=coverage.out ./...
+      - run: |
+          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          if (( $(echo "$coverage < 70" | bc -l) )); then
+            echo "Coverage below 70%"; exit 1
+          fi
+```
+
+### Makefile Standard
+
+All tools should include a Makefile with:
+
+```makefile
+.PHONY: test build install clean lint fmt run
+
+test:
+	go test -v -race -coverprofile=coverage.out ./...
+
+build:
+	go build -o bin/{tool} ./cmd/{tool}
+
+install:
+	go install ./cmd/{tool}
+
+clean:
+	rm -rf bin/ coverage.out
+
+lint:
+	golangci-lint run
+
+fmt:
+	go fmt ./...
+
+run:
+	go run ./cmd/{tool}
 ```
 
 ---

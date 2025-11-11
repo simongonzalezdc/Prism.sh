@@ -63,19 +63,52 @@ An interactive color design tool with educational components. Create palettes, u
 - Display current color: hex, RGB, HSL, HSV
 - Show complementary, analogous, triadic colors automatically
 - Animated highlight showing active hue
-- Export current color to clipboard or file
+- Export current color to clipboard (platform-specific) or file
+
+**Clipboard Support:**
+- Linux: X11 via xclip/xsel, Wayland via wl-clipboard
+- macOS: pbcopy
+- Windows: clip.exe
+- Fallback: Save to temporary file and display path
 
 **Technical Requirements:**
 - ASCII/Unicode visualization (no graphics)
 - Real-time color calculations
-- Terminal-aware color rendering (256-color or truecolor detection)
+- Terminal-aware color rendering:
+  - Truecolor (24-bit): Full RGB support
+  - 256-color: Closest color approximation
+  - 16-color: Display hex codes only with warning
+  - Monochrome: Fallback to text-only mode
 - Responsive to terminal resize
+- Auto-detect terminal capabilities via COLORTERM and TERM environment variables
 
 **Success Criteria:**
-- ✅ Displays full hue spectrum in <200 chars width
-- ✅ Navigate 360 degrees smoothly
-- ✅ Display all formats instantly (<100ms)
-- ✅ Works in 80x24 terminal minimum
+- [ ] Displays full hue spectrum in ≤180 characters width
+- [ ] Navigate 360 degrees with <50ms keystroke response
+- [ ] Display all color formats instantly (<100ms)
+- [ ] Functional UI in 80x24 terminal (minimum viable layout)
+
+**80x24 Terminal Layout:**
+```
+╭────────────────────────────────────────────────────────────────────────────╮
+│ PRISM - Color Wheel                                                  [?]  │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│   [████████████████ Color Wheel Ring ████████████████]                   │
+│   [Red→Orange→Yellow→Green→Cyan→Blue→Magenta→Red]                        │
+│                          ▲ Current: 180°                                  │
+│                                                                            │
+│   Current Color:  ████  #00D4FF  Cyan                                     │
+│   RGB: (0, 212, 255)   HSL: (180°, 100%, 50%)                            │
+│                                                                            │
+│   Complementary:  ████  #FF2B00  Red-Orange                               │
+│   Analogous:      ████  #00FF85  Spring Green                             │
+│                   ████  #0085FF  Azure                                    │
+│                                                                            │
+├────────────────────────────────────────────────────────────────────────────┤
+│ ←→: Navigate | Enter: Select | C: Copy | S: Save | Q: Quit | ?: Help     │
+╰────────────────────────────────────────────────────────────────────────────╯
+```
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -102,13 +135,13 @@ An interactive color design tool with educational components. Create palettes, u
 - HSL/HSV color space calculations
 - Harmonic relationships precise to ±5° hue error
 - Real-time generation (<500ms)
-- Validation that colors are perceptually harmonious
+- Generated palettes maintain sufficient contrast ratios and balanced saturation/lightness distribution
 
 **Success Criteria:**
-- ✅ Generates palettes for all 7 rules
-- ✅ Generated colors are visually harmonious
-- ✅ Visual display shows all palette colors with hex codes
-- ✅ Export works for all 4 formats
+- [ ] Generates palettes for all 7 rules
+- [ ] Generated palettes maintain minimum 3:1 contrast between adjacent colors
+- [ ] Visual display shows all palette colors with hex codes
+- [ ] Export works for all 4 formats (JSON, CSS, TOML, Kyanite)
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -128,15 +161,17 @@ An interactive color design tool with educational components. Create palettes, u
 
 **Technical Requirements:**
 - Pre-loaded database (~500 named colors)
-- Fast fuzzy search (<100ms)
+  - Source: CSS Color Module Level 4 (147 colors) + X11 colors (public domain)
+  - License: Public domain / W3C standard
+- Fast fuzzy search (<100ms, matches with 1-2 character differences)
 - Variations calculated in HSL space
 - Works offline
 
 **Success Criteria:**
-- ✅ Search finds 5-10 matching colors
-- ✅ Display name, hex, RGB, HSL
-- ✅ Show 5 tint/shade variations
-- ✅ Fuzzy matching works intuitively
+- [ ] Search finds 5-10 matching colors for common queries
+- [ ] Display name, hex, RGB, HSL for each color
+- [ ] Show 5 tint/shade variations (±20%, ±40% lightness)
+- [ ] Fuzzy search matches colors with 1-2 character typos
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -159,10 +194,10 @@ An interactive color design tool with educational components. Create palettes, u
 - 50+ visual examples
 
 **Success Criteria:**
-- ✅ At least 5 lessons implemented
-- ✅ Each lesson includes visual examples
-- ✅ 2-3 minutes to read/interact per lesson
-- ✅ Content is accurate and beginner-friendly
+- [ ] At least 5 lessons implemented
+- [ ] Each lesson includes 3+ visual examples with color swatches
+- [ ] Each lesson is 200-400 words (2-3 minute read time)
+- [ ] Content uses simple language (8th grade reading level or below)
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -187,10 +222,10 @@ An interactive color design tool with educational components. Create palettes, u
 - Works for all color formats
 
 **Success Criteria:**
-- ✅ Contrast ratio accurate within ±0.05
-- ✅ WCAG AA/AAA determination correct
-- ✅ Provides actionable recommendations
-- ✅ Supports batch checking
+- [ ] Contrast ratio accurate within ±0.05 compared to WebAIM checker
+- [ ] WCAG AA/AAA determination matches official WCAG 2.1 spec
+- [ ] Provides specific recommendations (e.g., "Darken background by 15%")
+- [ ] Supports batch checking of 10+ color pairs
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -209,21 +244,27 @@ An interactive color design tool with educational components. Create palettes, u
 - **Import:** Load palette from file
 
 **Storage:**
-- Location: `~/.config/prism/palettes/`
+- Location (cross-platform):
+  - Linux: `~/.config/prism/palettes/`
+  - macOS: `~/Library/Application Support/prism/palettes/`
+  - Windows: `%APPDATA%/prism/palettes/`
 - Format: JSON with metadata
 - Auto-organize by creation date
+- File locking: Advisory locks prevent concurrent write conflicts
 
 **Technical Requirements:**
 - Fast file I/O (<100ms)
-- Graceful error handling
+- Graceful error handling with user-friendly messages
 - Support multiple export formats
-- Handle corrupted files gracefully
+- Handle corrupted files gracefully (skip and log, don't crash)
+- Advisory file locking to prevent concurrent modification
+- Atomic writes (write to .tmp, then rename) to prevent corruption
 
 **Success Criteria:**
-- ✅ Save/load cycle preserves colors exactly
-- ✅ List shows 20+ previous palettes
-- ✅ Export generates valid formats
-- ✅ Import from external files works
+- [ ] Save/load cycle preserves all color values exactly (hex match)
+- [ ] List shows 20+ previous palettes with pagination
+- [ ] Export generates valid, parseable JSON/CSS/TOML files
+- [ ] Import validates and handles malformed files gracefully
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -239,13 +280,67 @@ An interactive color design tool with educational components. Create palettes, u
 - **Interoperability:** Exported colors work in other tools
 - **Documentation:** Format is documented and versioned
 
-**Export Format:**
+**Export Formats:**
+
+**JSON:**
 ```json
 {
-  "name": "My Palette",
+  "id": "palette_20251115_103000",
+  "name": "Electric Dream",
   "kyanite_version": "1.0",
   "created_at": "2025-11-15T10:30:00Z",
-  "palette": {
+  "harmony_rule": "triadic",
+  "colors": [
+    {"hex": "#FF0080", "name": "Electric Pink", "role": "primary"},
+    {"hex": "#00D4FF", "name": "Cyan", "role": "secondary"},
+    {"hex": "#FFE600", "name": "Yellow", "role": "accent"}
+  ]
+}
+```
+
+**CSS Variables:**
+```css
+/* Generated by prism.sh - Electric Dream */
+:root {
+  --color-primary: #FF0080;
+  --color-secondary: #00D4FF;
+  --color-accent: #FFE600;
+  --color-primary-rgb: 255, 0, 128;
+  --color-secondary-rgb: 0, 212, 255;
+  --color-accent-rgb: 255, 230, 0;
+}
+```
+
+**TOML:**
+```toml
+# Generated by prism.sh - Electric Dream
+name = "Electric Dream"
+harmony_rule = "triadic"
+created_at = "2025-11-15T10:30:00Z"
+
+[[colors]]
+name = "Electric Pink"
+hex = "#FF0080"
+role = "primary"
+
+[[colors]]
+name = "Cyan"
+hex = "#00D4FF"
+role = "secondary"
+
+[[colors]]
+name = "Yellow"
+hex = "#FFE600"
+role = "accent"
+```
+
+**Kyanite Theme Format:**
+```json
+{
+  "name": "Electric Dream",
+  "kyanite_version": "1.0",
+  "created_at": "2025-11-15T10:30:00Z",
+  "theme": {
     "primary": "#FF0080",
     "secondary": "#00D4FF",
     "accent": "#FFE600",
@@ -257,9 +352,9 @@ An interactive color design tool with educational components. Create palettes, u
 ```
 
 **Success Criteria:**
-- ✅ Exports are valid JSON
-- ✅ Format documented
-- ✅ Can be imported by other tools (future)
+- [ ] Exports are valid JSON per RFC 8259
+- [ ] Format documented with version number and schema
+- [ ] Can be imported by other tools (validation via JSON schema)
 
 **Status:** Core feature, MUST ship v1.0
 
@@ -329,14 +424,12 @@ Time: 30 seconds
 
 Explicitly NOT v1.0:
 
-- Photo/image analysis
-- Gradient generation
-- Colorblind simulation
-- AI naming ("poet mode")
-- Real-time collaboration
-- Cloud sync
-- Animation or transitions
-- Grammar checking
+- Photo/image analysis (extract colors from images)
+- Gradient generation (smooth color transitions)
+- Colorblind simulation (deferred to v2.0)
+- Real-time collaboration (multi-user editing)
+- Cloud sync (all storage is local)
+- Animation or transitions beyond simple highlights
 
 ---
 
@@ -348,21 +441,21 @@ Explicitly NOT v1.0:
 - **Color wheel render:** <100ms
 - **Palette generation:** <500ms
 - **Search:** <100ms
-- **Memory:** <30MB idle
+- **Memory:** <50MB idle
 - **File I/O:** <100ms
 
 ### Feature Completion
 
-- ✅ All 7 core features implemented
-- ✅ All acceptance criteria met
-- ✅ 0 known critical bugs
+- [ ] All 7 core features implemented
+- [ ] All acceptance criteria met
+- [ ] 0 known critical bugs
 
 ### Code Quality
 
-- ✅ No TODO comments
-- ✅ Error handling complete
-- ✅ Tests for critical paths
-- ✅ Documentation comprehensive
+- [ ] No TODO comments in main code paths
+- [ ] Error handling complete with user-friendly messages
+- [ ] Tests for critical paths (>70% coverage)
+- [ ] Documentation comprehensive (README, ARCHITECTURE, inline docs)
 
 ---
 
@@ -371,32 +464,35 @@ Explicitly NOT v1.0:
 ### Must Have (v1.0)
 
 - [ ] Color wheel displays all 360 hues visually
-- [ ] Arrow key navigation smooth
-- [ ] All 7 harmony rules work correctly
-- [ ] Generated palettes are harmonious
-- [ ] Save/load preserves colors exactly
-- [ ] WCAG checker accurate
-- [ ] Export to JSON, CSS, TOML works
-- [ ] 10 Kyanite themes applied
+- [ ] Arrow key navigation smooth (<50ms response)
+- [ ] All 7 harmony rules work correctly (±5° accuracy)
+- [ ] Generated palettes maintain 3:1 minimum contrast between adjacent colors
+- [ ] Save/load preserves colors exactly (hex value match)
+- [ ] WCAG checker accurate (±0.05 ratio compared to WebAIM)
+- [ ] Export to JSON, CSS, TOML, Kyanite format works
+- [ ] 10 Kyanite app themes applied for UI styling
 - [ ] Ctrl+Shift+T theme switcher works
-- [ ] All universal shortcuts implemented
-- [ ] Help system complete
-- [ ] No panics or crashes
-- [ ] Works on 80x24 terminal
-- [ ] README complete
-- [ ] ARCHITECTURE complete
+- [ ] All universal shortcuts implemented (except undo/redo - not in v1.0)
+- [ ] Help system complete with all shortcuts documented
+- [ ] No panics in application code (all panics recovered gracefully)
+- [ ] Functional UI in 80x24 terminal minimum
+- [ ] README complete with installation and usage examples
+- [ ] ARCHITECTURE.md complete with module breakdown
+- [ ] LICENSE file included (MIT)
+- [ ] CONTRIBUTING.md with guidelines
+- [ ] Clipboard support works on Linux/macOS/Windows
 
 ### Performance Targets
 
 - [ ] Startup: <1s
-- [ ] Operations: <500ms
-- [ ] Memory: <30MB idle
+- [ ] All operations: <500ms
+- [ ] Memory: <50MB idle
 
 ### Quality Targets
 
-- [ ] 0 panic conditions
-- [ ] 100% error handling
-- [ ] All workflows <5 minutes
+- [ ] 0 panics in application code (all external panics recovered)
+- [ ] 100% error handling with user-friendly messages
+- [ ] All user workflows completable in <5 minutes
 
 ---
 
@@ -404,11 +500,14 @@ Explicitly NOT v1.0:
 
 | Phase | Duration | Deliverables |
 |-------|----------|--------------|
-| **Foundation** | 2 days | Project structure, theme system |
-| **Features** | 3 days | All 7 features with UI |
-| **Polish** | 1 day | Docs, testing, refinement |
-| **Release** | 1 day | GitHub repo, v1.0 release |
-| **TOTAL** | ~7 days | Launch ready |
+| **Foundation** | 2-3 days | Project structure, theme system, core color math |
+| **Features** | 5-6 days | All 7 features with UI, cross-platform support |
+| **Content** | 2-3 days | Color theory lessons, named colors DB, help system |
+| **Polish** | 2-3 days | Testing, docs, platform testing, refinement |
+| **Release** | 1 day | GitHub repo, CI/CD, v1.0 release |
+| **TOTAL** | 12-16 days | Launch ready |
+
+**Note:** Timeline assumes single developer working full-time. Adjust accordingly for part-time or multiple contributors.
 
 ---
 
