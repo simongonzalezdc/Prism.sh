@@ -38,7 +38,7 @@ func TestWCAGContrast(t *testing.T) {
 			fg:        "#FF0080",
 			bg:        "#0D0221",
 			wantRatio: 5.2,
-			wantLevel: "AAA",
+			wantLevel: "AA",
 			tolerance: 0.3,
 		},
 		{
@@ -132,14 +132,14 @@ func TestRelativeLuminance(t *testing.T) {
 
 func TestContrastResultSummary(t *testing.T) {
 	result := wcag.ContrastResult{
-		Ratio:     5.2,
+		Ratio:     7.5,
 		Level:     "AAA",
 		PassedAA:  true,
 		PassedAAA: true,
 	}
 
 	summary := result.Summary()
-	expected := "5.20:1 - WCAG AAA"
+	expected := "7.50:1 - WCAG AAA"
 	if summary != expected {
 		t.Errorf("Summary() = %q, want %q", summary, expected)
 	}

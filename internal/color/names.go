@@ -1,13 +1,11 @@
 package color
 
 import (
-	"embed"
 	"encoding/json"
 	"strings"
-)
 
-//go:embed ../../data/colors.json
-var colorsData embed.FS
+	"github.com/kyanite/prism/internal/data"
+)
 
 // NamedColor represents a named color
 type NamedColor struct {
@@ -28,13 +26,8 @@ func LoadNamedColors() error {
 		return nil // Already loaded
 	}
 
-	data, err := colorsData.ReadFile("../../data/colors.json")
-	if err != nil {
-		return err
-	}
-
 	db = &ColorDatabase{}
-	err = json.Unmarshal(data, db)
+	err := json.Unmarshal(data.ColorsJSON, db)
 	if err != nil {
 		return err
 	}
