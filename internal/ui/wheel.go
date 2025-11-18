@@ -56,20 +56,17 @@ func (m WheelModel) Update(msg tea.Msg) (WheelModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the color wheel
 func (m WheelModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
 	// Title
-	title := m.styles.Title.Render("Color Wheel")
+	title := styles.Title.Render("Color Wheel")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
@@ -83,11 +80,11 @@ func (m WheelModel) View() string {
 
 	// Current hue indicator
 	indicator := fmt.Sprintf("Current: %.0f°", m.currentHue)
-	b.WriteString(m.styles.Accent.Render(indicator))
+	b.WriteString(styles.Accent.Render(indicator))
 	b.WriteString("\n\n")
 
 	// Current color info
-	b.WriteString(m.styles.Primary.Render("Current Color:"))
+	b.WriteString(styles.Primary.Render("Current Color:"))
 	b.WriteString("\n")
 
 	swatch := lipgloss.NewStyle().
@@ -104,7 +101,7 @@ func (m WheelModel) View() string {
 	b.WriteString("\n")
 
 	// Related colors
-	b.WriteString(m.styles.Secondary.Render("Related Colors:"))
+	b.WriteString(styles.Secondary.Render("Related Colors:"))
 	b.WriteString("\n")
 
 	complement := currentColor.Complement()
@@ -119,11 +116,11 @@ func (m WheelModel) View() string {
 	b.WriteString("\n")
 
 	// Help
-	help := m.styles.Muted.Render("←/→: Hue • ↑/↓: Lightness • +/-: Saturation • Esc: Menu")
+	help := styles.Muted.Render("←/→: Hue • ↑/↓: Lightness • +/-: Saturation • Esc: Menu")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(70).Render(b.String())
 
 	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
 }

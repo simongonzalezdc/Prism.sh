@@ -13,12 +13,12 @@ func TestParseHex(t *testing.T) {
 		wantRGB color.RGB
 		wantErr bool
 	}{
-		{"#FF0000", color.RGB{255, 0, 0}, false},
-		{"#00FF00", color.RGB{0, 255, 0}, false},
-		{"#0000FF", color.RGB{0, 0, 255}, false},
-		{"#FFFFFF", color.RGB{255, 255, 255}, false},
-		{"#000000", color.RGB{0, 0, 0}, false},
-		{"FF0000", color.RGB{255, 0, 0}, false}, // Without #
+		{"#FF0000", color.RGB{R: 255, G: 0, B: 0}, false},
+		{"#00FF00", color.RGB{R: 0, G: 255, B: 0}, false},
+		{"#0000FF", color.RGB{R: 0, G: 0, B: 255}, false},
+		{"#FFFFFF", color.RGB{R: 255, G: 255, B: 255}, false},
+		{"#000000", color.RGB{R: 0, G: 0, B: 0}, false},
+		{"FF0000", color.RGB{R: 255, G: 0, B: 0}, false}, // Without #
 		{"#GGGGGG", color.RGB{}, true},          // Invalid
 		{"#FFF", color.RGB{}, true},             // Too short
 	}
@@ -62,12 +62,12 @@ func TestRGBToHSL(t *testing.T) {
 		rgb  color.RGB
 		want color.HSL
 	}{
-		{"Red", color.RGB{255, 0, 0}, color.HSL{0, 100, 50}},
-		{"Green", color.RGB{0, 255, 0}, color.HSL{120, 100, 50}},
-		{"Blue", color.RGB{0, 0, 255}, color.HSL{240, 100, 50}},
-		{"White", color.RGB{255, 255, 255}, color.HSL{0, 0, 100}},
-		{"Black", color.RGB{0, 0, 0}, color.HSL{0, 0, 0}},
-		{"Gray", color.RGB{128, 128, 128}, color.HSL{0, 0, 50}},
+		{"Red", color.RGB{R: 255, G: 0, B: 0}, color.HSL{H: 0, S: 100, L: 50}},
+		{"Green", color.RGB{R: 0, G: 255, B: 0}, color.HSL{H: 120, S: 100, L: 50}},
+		{"Blue", color.RGB{R: 0, G: 0, B: 255}, color.HSL{H: 240, S: 100, L: 50}},
+		{"White", color.RGB{R: 255, G: 255, B: 255}, color.HSL{H: 0, S: 0, L: 100}},
+		{"Black", color.RGB{R: 0, G: 0, B: 0}, color.HSL{H: 0, S: 0, L: 0}},
+		{"Gray", color.RGB{R: 128, G: 128, B: 128}, color.HSL{H: 0, S: 0, L: 50}},
 	}
 
 	for _, tt := range tests {
@@ -86,11 +86,11 @@ func TestHSLToRGB(t *testing.T) {
 		hsl  color.HSL
 		want color.RGB
 	}{
-		{"Red", color.HSL{0, 100, 50}, color.RGB{255, 0, 0}},
-		{"Green", color.HSL{120, 100, 50}, color.RGB{0, 255, 0}},
-		{"Blue", color.HSL{240, 100, 50}, color.RGB{0, 0, 255}},
-		{"White", color.HSL{0, 0, 100}, color.RGB{255, 255, 255}},
-		{"Black", color.HSL{0, 0, 0}, color.RGB{0, 0, 0}},
+		{"Red", color.HSL{H: 0, S: 100, L: 50}, color.RGB{R: 255, G: 0, B: 0}},
+		{"Green", color.HSL{H: 120, S: 100, L: 50}, color.RGB{R: 0, G: 255, B: 0}},
+		{"Blue", color.HSL{H: 240, S: 100, L: 50}, color.RGB{R: 0, G: 0, B: 255}},
+		{"White", color.HSL{H: 0, S: 0, L: 100}, color.RGB{R: 255, G: 255, B: 255}},
+		{"Black", color.HSL{H: 0, S: 0, L: 0}, color.RGB{R: 0, G: 0, B: 0}},
 	}
 
 	for _, tt := range tests {
@@ -106,11 +106,11 @@ func TestHSLToRGB(t *testing.T) {
 func TestColorConversionRoundtrip(t *testing.T) {
 	// Test that RGB -> HSL -> RGB is reversible
 	tests := []color.RGB{
-		{255, 0, 0},
-		{0, 255, 0},
-		{0, 0, 255},
-		{128, 64, 192},
-		{255, 128, 64},
+		{R: 255, G: 0, B: 0},
+		{R: 0, G: 255, B: 0},
+		{R: 0, G: 0, B: 255},
+		{R: 128, G: 64, B: 192},
+		{R: 255, G: 128, B: 64},
 	}
 
 	for _, original := range tests {

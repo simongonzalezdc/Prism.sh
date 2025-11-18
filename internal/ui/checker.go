@@ -46,25 +46,22 @@ func (m CheckerModel) Update(msg tea.Msg) (CheckerModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the checker
 func (m CheckerModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
 	// Title
-	title := m.styles.Title.Render("WCAG Accessibility Checker")
+	title := styles.Title.Render("WCAG Accessibility Checker")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
 	// Input colors
-	b.WriteString(m.styles.Primary.Render("Colors to Check:"))
+	b.WriteString(styles.Primary.Render("Colors to Check:"))
 	b.WriteString("\n")
 
 	fgSwatch := lipgloss.NewStyle().
@@ -83,18 +80,18 @@ func (m CheckerModel) View() string {
 
 	// Result
 	if m.result != nil {
-		b.WriteString(m.styles.Secondary.Render("Contrast Ratio:"))
+		b.WriteString(styles.Secondary.Render("Contrast Ratio:"))
 		b.WriteString("\n")
 
 		// Contrast ratio
 		ratioText := fmt.Sprintf("%.2f:1", m.result.Ratio)
 		var ratioStyle lipgloss.Style
 		if m.result.PassedAAA {
-			ratioStyle = m.styles.Success
+			ratioStyle = styles.Success
 		} else if m.result.PassedAA {
-			ratioStyle = m.styles.Accent
+			ratioStyle = styles.Accent
 		} else {
-			ratioStyle = m.styles.Error
+			ratioStyle = styles.Error
 		}
 		b.WriteString(ratioStyle.Bold(true).Render(ratioText))
 		b.WriteString("\n\n")
@@ -102,16 +99,16 @@ func (m CheckerModel) View() string {
 		// WCAG levels
 		b.WriteString("WCAG Compliance:\n")
 		if m.result.PassedAAA {
-			b.WriteString(m.styles.Success.Render("✓ AAA (7:1) - Excellent"))
+			b.WriteString(styles.Success.Render("✓ AAA (7:1) - Excellent"))
 		} else if m.result.PassedAA {
-			b.WriteString(m.styles.Accent.Render("✓ AA (4.5:1) - Good"))
+			b.WriteString(styles.Accent.Render("✓ AA (4.5:1) - Good"))
 		} else {
-			b.WriteString(m.styles.Error.Render("✗ FAIL - Insufficient contrast"))
+			b.WriteString(styles.Error.Render("✗ FAIL - Insufficient contrast"))
 		}
 		b.WriteString("\n\n")
 
 		// Sample text
-		b.WriteString(m.styles.Secondary.Render("Sample:"))
+		b.WriteString(styles.Secondary.Render("Sample:"))
 		b.WriteString("\n")
 
 		sample := lipgloss.NewStyle().
@@ -125,16 +122,16 @@ func (m CheckerModel) View() string {
 
 	// Error
 	if m.err != "" {
-		b.WriteString(m.styles.Error.Render("Error: " + m.err))
+		b.WriteString(styles.Error.Render("Error: " + m.err))
 		b.WriteString("\n\n")
 	}
 
 	// Help
-	help := m.styles.Muted.Render("Enter: Check Contrast • Esc: Menu")
+	help := styles.Muted.Render("Enter: Check Contrast • Esc: Menu")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(70).Render(b.String())
 
 	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
 }

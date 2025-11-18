@@ -3,6 +3,7 @@ package color
 import (
 	"encoding/json"
 	"strings"
+	"sync"
 
 	"github.com/kyanite/prism/internal/data"
 )
@@ -18,10 +19,16 @@ type ColorDatabase struct {
 	Colors []NamedColor `json:"colors"`
 }
 
-var db *ColorDatabase
+var (
+	db *ColorDatabase
+	mu sync.RWMutex
+)
 
 // LoadNamedColors loads the named colors database
 func LoadNamedColors() error {
+	mu.Lock()
+	defer mu.Unlock()
+
 	if db != nil {
 		return nil // Already loaded
 	}
@@ -37,9 +44,15 @@ func LoadNamedColors() error {
 
 // SearchColors searches for colors by name (fuzzy search)
 func SearchColors(query string) []NamedColor {
+	mu.RLock()
 	if db == nil {
-		LoadNamedColors()
+		mu.RUnlock()
+		if err := LoadNamedColors(); err != nil {
+			return []NamedColor{}
+		}
+		mu.RLock()
 	}
+	defer mu.RUnlock()
 
 	query = strings.ToLower(query)
 	results := []NamedColor{}
@@ -82,9 +95,15 @@ func SearchColors(query string) []NamedColor {
 
 // GetColorByName returns a color by exact name
 func GetColorByName(name string) (*NamedColor, error) {
+	mu.RLock()
 	if db == nil {
-		LoadNamedColors()
+		mu.RUnlock()
+		if err := LoadNamedColors(); err != nil {
+			return nil, err
+		}
+		mu.RLock()
 	}
+	defer mu.RUnlock()
 
 	name = strings.ToLower(name)
 	for _, c := range db.Colors {
@@ -98,9 +117,15 @@ func GetColorByName(name string) (*NamedColor, error) {
 
 // AllNamedColors returns all named colors
 func AllNamedColors() []NamedColor {
+	mu.RLock()
 	if db == nil {
-		LoadNamedColors()
+		mu.RUnlock()
+		if err := LoadNamedColors(); err != nil {
+			return []NamedColor{}
+		}
+		mu.RLock()
 	}
+	defer mu.RUnlock()
 
 	return db.Colors
 }

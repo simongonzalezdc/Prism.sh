@@ -3,7 +3,6 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -56,7 +55,7 @@ func LoadPalette(id string) (*palette.Palette, error) {
 	}
 
 	filename := filepath.Join(configDir, "palettes", id+".json")
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read palette: %w", err)
 	}
@@ -85,7 +84,7 @@ func ListPalettes() ([]palette.Palette, error) {
 	}
 
 	palettesDir := filepath.Join(configDir, "palettes")
-	files, err := ioutil.ReadDir(palettesDir)
+	files, err := os.ReadDir(palettesDir)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []palette.Palette{}, nil
@@ -95,7 +94,7 @@ func ListPalettes() ([]palette.Palette, error) {
 
 	palettes := []palette.Palette{}
 	for _, file := range files {
-		if filepath.Ext(file.Name()) != ".json" {
+		if file.IsDir() || filepath.Ext(file.Name()) != ".json" {
 			continue
 		}
 

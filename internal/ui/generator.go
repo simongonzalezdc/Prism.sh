@@ -56,37 +56,34 @@ func (m GeneratorModel) Update(msg tea.Msg) (GeneratorModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the generator
 func (m GeneratorModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
 	// Title
-	title := m.styles.Title.Render("Palette Generator")
+	title := styles.Title.Render("Palette Generator")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
 	// Base color
-	b.WriteString(m.styles.Primary.Render("Base Color: "))
+	b.WriteString(styles.Primary.Render("Base Color: "))
 	b.WriteString(m.baseColorInput)
 	b.WriteString("\n\n")
 
 	// Harmony rules
-	b.WriteString(m.styles.Secondary.Render("Select Harmony Rule:"))
+	b.WriteString(styles.Secondary.Render("Select Harmony Rule:"))
 	b.WriteString("\n")
 
 	for i, rule := range m.rules {
-		style := m.styles.Unselected
+		style := styles.Unselected
 		cursor := "  "
 		if i == m.selectedRule {
-			style = m.styles.Selected
+			style = styles.Selected
 			cursor = "▸ "
 		}
 
@@ -99,7 +96,7 @@ func (m GeneratorModel) View() string {
 
 	// Generated palette
 	if m.generatedPalette != nil {
-		b.WriteString(m.styles.Success.Render("Generated Palette:"))
+		b.WriteString(styles.Success.Render("Generated Palette:"))
 		b.WriteString("\n")
 
 		for i, c := range m.generatedPalette.Colors {
@@ -117,16 +114,16 @@ func (m GeneratorModel) View() string {
 
 	// Error
 	if m.err != "" {
-		b.WriteString(m.styles.Error.Render("Error: " + m.err))
+		b.WriteString(styles.Error.Render("Error: " + m.err))
 		b.WriteString("\n\n")
 	}
 
 	// Help
-	help := m.styles.Muted.Render("↑/↓: Select Rule • Enter: Generate • Esc: Menu")
+	help := styles.Muted.Render("↑/↓: Select Rule • Enter: Generate • Esc: Menu")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(70).Render(b.String())
 
 	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
 }

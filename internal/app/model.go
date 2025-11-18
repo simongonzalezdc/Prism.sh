@@ -35,7 +35,6 @@ type Model struct {
 	managerModel   ui.ManagerModel
 
 	showHelp bool
-	err      error
 }
 
 // NewModel creates a new root model

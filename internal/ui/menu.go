@@ -77,15 +77,12 @@ func (m MenuModel) Update(msg tea.Msg) (MenuModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the menu
 func (m MenuModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
@@ -103,10 +100,10 @@ func (m MenuModel) View() string {
 
 	// Menu options
 	for i, opt := range m.options {
-		style := m.styles.Unselected
+		style := styles.Unselected
 		cursor := "  "
 		if i == m.selected {
-			style = m.styles.Selected
+			style = styles.Selected
 			cursor = "▸ "
 		}
 
@@ -118,11 +115,11 @@ func (m MenuModel) View() string {
 	b.WriteString("\n")
 
 	// Help text
-	help := m.styles.Muted.Render("↑/↓: Navigate • Enter: Select • Ctrl+H: Help • Ctrl+Q: Quit")
+	help := styles.Muted.Render("↑/↓: Navigate • Enter: Select • Ctrl+H: Help • Ctrl+Q: Quit")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(60).Render(b.String())
+	content := styles.Border.Width(60).Render(b.String())
 
 	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
 }

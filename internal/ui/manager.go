@@ -56,36 +56,33 @@ func (m ManagerModel) Update(msg tea.Msg) (ManagerModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the manager
 func (m ManagerModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
 	// Title
-	title := m.styles.Title.Render("Palette Manager")
+	title := styles.Title.Render("Palette Manager")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
 	// Palettes list
 	if len(m.palettes) == 0 {
-		b.WriteString(m.styles.Muted.Render("No saved palettes"))
+		b.WriteString(styles.Muted.Render("No saved palettes"))
 		b.WriteString("\n\n")
 	} else {
-		b.WriteString(m.styles.Secondary.Render(fmt.Sprintf("Saved Palettes (%d):", len(m.palettes))))
+		b.WriteString(styles.Secondary.Render(fmt.Sprintf("Saved Palettes (%d):", len(m.palettes))))
 		b.WriteString("\n")
 
 		for i, pal := range m.palettes {
-			style := m.styles.Unselected
+			style := styles.Unselected
 			cursor := "  "
 			if i == m.selected {
-				style = m.styles.Selected
+				style = styles.Selected
 				cursor = "▸ "
 			}
 
@@ -114,16 +111,16 @@ func (m ManagerModel) View() string {
 
 	// Error
 	if m.err != "" {
-		b.WriteString(m.styles.Error.Render("Error: " + m.err))
+		b.WriteString(styles.Error.Render("Error: " + m.err))
 		b.WriteString("\n\n")
 	}
 
 	// Help
-	help := m.styles.Muted.Render("↑/↓: Navigate • D: Delete • R: Refresh • Esc: Menu")
+	help := styles.Muted.Render("↑/↓: Navigate • D: Delete • R: Refresh • Esc: Menu")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(70).Render(b.String())
 
 	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
 }
