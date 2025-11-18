@@ -8,13 +8,11 @@ import (
 
 // ExportJSON exports palette to JSON format
 func ExportJSON(p palette.Palette) ([]byte, error) {
-	// TODO: Implement JSON export
 	// Format matches PRD specification (RFC 8259 compliant)
 	return json.MarshalIndent(p, "", "  ")
 }
 
 // ExportJSONCompact exports palette to compact JSON
 func ExportJSONCompact(p palette.Palette) ([]byte, error) {
-	// TODO: Implement compact JSON export
 	return json.Marshal(p)
 }

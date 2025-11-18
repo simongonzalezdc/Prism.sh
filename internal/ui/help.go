@@ -55,7 +55,7 @@ func RenderHelp(tm *theme.Manager, width, height int) string {
 	b.WriteString(footer)
 
 	// Wrap in border
-	content := styles.Border.Width(60).Render(b.String())
+	content := styles.Border.Width(ContentWidthNarrow).Render(b.String())
 
 	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, content)
 }

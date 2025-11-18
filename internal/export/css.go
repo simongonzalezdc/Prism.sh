@@ -9,7 +9,6 @@ import (
 
 // ExportCSS exports palette as CSS custom properties
 func ExportCSS(p palette.Palette) string {
-	// TODO: Implement CSS export per PRD specification
 	// Format: CSS variables with both hex and RGB values
 
 	var sb strings.Builder

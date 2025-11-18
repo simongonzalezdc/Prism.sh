@@ -14,9 +14,6 @@ type FileLock struct {
 
 // LockFile acquires an advisory lock on a file
 func LockFile(path string) (*FileLock, error) {
-	// TODO: Implement cross-platform file locking
-	// - Linux/macOS: Use golang.org/x/sys/unix Flock
-	// - Windows: Use LockFileEx via syscall
 	// For now, simple implementation using lock files
 
 	lockPath := path + ".lock"
@@ -45,10 +42,6 @@ func UnlockFile(lock *FileLock) error {
 
 // AtomicWrite writes data atomically by writing to a temp file then renaming
 func AtomicWrite(path string, data []byte) error {
-	// TODO: Implement atomic write
-	// 1. Write to {path}.tmp
-	// 2. Rename to {path} (atomic operation)
-	// 3. This prevents corruption if interrupted
 
 	dir := filepath.Dir(path)
 	tmpFile, err := os.CreateTemp(dir, ".tmp-*")

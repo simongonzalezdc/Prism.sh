@@ -7,7 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/kyanite/prism/internal/clipboard"
 	"github.com/kyanite/prism/internal/color"
+	"github.com/kyanite/prism/internal/palette"
 	"github.com/kyanite/prism/internal/theme"
 )
 
@@ -18,6 +20,7 @@ type WheelModel struct {
 	currentHue   float64
 	saturation   float64
 	lightness    float64
+	status       string
 }
 
 // NewWheelModel creates a new color wheel model
@@ -43,16 +46,29 @@ func (m WheelModel) Update(msg tea.Msg) (WheelModel, tea.Cmd) {
 		switch msg.String() {
 		case "left", "h":
 			m.currentHue = math.Mod(m.currentHue-5+360, 360)
+			m.status = ""
 		case "right", "l":
 			m.currentHue = math.Mod(m.currentHue+5, 360)
+			m.status = ""
 		case "up", "k":
 			m.lightness = math.Min(100, m.lightness+5)
+			m.status = ""
 		case "down", "j":
 			m.lightness = math.Max(0, m.lightness-5)
+			m.status = ""
 		case "+":
 			m.saturation = math.Min(100, m.saturation+10)
+			m.status = ""
 		case "-":
 			m.saturation = math.Max(0, m.saturation-10)
+			m.status = ""
+		case "c":
+			currentColor := color.NewFromHSL(m.currentHue, m.saturation, m.lightness)
+			if err := clipboard.Copy(currentColor.Hex); err == nil {
+				m.status = fmt.Sprintf("✓ Copied %s to clipboard", currentColor.Hex)
+			} else {
+				m.status = "✗ Clipboard unavailable - use export instead"
+			}
 		}
 	}
 
@@ -107,22 +123,28 @@ func (m WheelModel) View() string {
 	complement := currentColor.Complement()
 	b.WriteString(m.renderColorLine("Complementary:", complement))
 
-	analogous1 := color.NewFromHSL(math.Mod(m.currentHue-30+360, 360), m.saturation, m.lightness)
+	analogous1 := color.NewFromHSL(math.Mod(m.currentHue-palette.AnalogousAngle+360, 360), m.saturation, m.lightness)
 	b.WriteString(m.renderColorLine("Analogous -30°:", analogous1))
 
-	analogous2 := color.NewFromHSL(math.Mod(m.currentHue+30, 360), m.saturation, m.lightness)
+	analogous2 := color.NewFromHSL(math.Mod(m.currentHue+palette.AnalogousAngle, 360), m.saturation, m.lightness)
 	b.WriteString(m.renderColorLine("Analogous +30°:", analogous2))
 
 	b.WriteString("\n")
 
+	// Status message
+	if m.status != "" {
+		b.WriteString(styles.Success.Render(m.status))
+		b.WriteString("\n\n")
+	}
+
 	// Help
-	help := styles.Muted.Render("←/→: Hue • ↑/↓: Lightness • +/-: Saturation • Esc: Menu")
+	help := styles.Muted.Render("←/→: Hue • ↑/↓: Lightness • +/-: Saturation • C: Copy • Esc: Menu")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(ContentWidth).Render(b.String())
 
-	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
+	return lipgloss.Place(ScreenWidth, ScreenHeight, lipgloss.Center, lipgloss.Center, content)
 }
 
 // renderColorBar renders the hue spectrum

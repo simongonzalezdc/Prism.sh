@@ -123,9 +123,9 @@ func (m GeneratorModel) View() string {
 	b.WriteString(help)
 
 	// Wrap in border
-	content := styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(ContentWidth).Render(b.String())
 
-	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
+	return lipgloss.Place(ScreenWidth, ScreenHeight, lipgloss.Center, lipgloss.Center, content)
 }
 
 // generate generates a palette

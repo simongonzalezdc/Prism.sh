@@ -55,8 +55,8 @@ func linearize(channel float64) float64 {
 func Validate(fg, bg color.Color) ContrastResult {
 	ratio := CalculateContrast(fg, bg)
 
-	passedAA := ratio >= 4.5
-	passedAAA := ratio >= 7.0
+	passedAA := ratio >= ContrastRatioAA
+	passedAAA := ratio >= ContrastRatioAAA
 
 	var level string
 	if passedAAA {
@@ -82,20 +82,20 @@ func (r ContrastResult) Summary() string {
 
 // IsPassingAASmall returns true if passing AA for small text
 func IsPassingAASmall(contrast float64) bool {
-	return contrast >= 4.5
+	return contrast >= ContrastRatioAA
 }
 
 // IsPassingAALarge returns true if passing AA for large text
 func IsPassingAALarge(contrast float64) bool {
-	return contrast >= 3.0
+	return contrast >= ContrastRatioAALarge
 }
 
 // IsPassingAAASmall returns true if passing AAA for small text
 func IsPassingAAASmall(contrast float64) bool {
-	return contrast >= 7.0
+	return contrast >= ContrastRatioAAA
 }
 
 // IsPassingAAALarge returns true if passing AAA for large text
 func IsPassingAAALarge(contrast float64) bool {
-	return contrast >= 4.5
+	return contrast >= ContrastRatioAAALarge
 }
