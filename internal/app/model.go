@@ -16,6 +16,7 @@ const (
 	ScreenTheory
 	ScreenChecker
 	ScreenManager
+	ScreenSearch
 	ScreenHelp
 )
 
@@ -33,6 +34,7 @@ type Model struct {
 	theoryModel    ui.TheoryModel
 	checkerModel   ui.CheckerModel
 	managerModel   ui.ManagerModel
+	searchModel    ui.SearchModel
 
 	showHelp bool
 }
@@ -50,6 +52,7 @@ func NewModel() Model {
 		theoryModel:   ui.NewTheoryModel(themeManager),
 		checkerModel:  ui.NewCheckerModel(themeManager),
 		managerModel:  ui.NewManagerModel(themeManager),
+		searchModel:   ui.NewSearchModel(themeManager),
 	}
 }
 
@@ -97,6 +100,8 @@ func (m Model) View() string {
 		return m.checkerModel.View()
 	case ScreenManager:
 		return m.managerModel.View()
+	case ScreenSearch:
+		return m.searchModel.View()
 	default:
 		return "Unknown screen"
 	}
@@ -149,6 +154,8 @@ func (m Model) routeToScreen(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.checkerModel, cmd = m.checkerModel.Update(msg)
 	case ScreenManager:
 		m.managerModel, cmd = m.managerModel.Update(msg)
+	case ScreenSearch:
+		m.searchModel, cmd = m.searchModel.Update(msg)
 	}
 
 	return m, cmd

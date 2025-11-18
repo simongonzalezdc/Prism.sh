@@ -28,6 +28,7 @@ func NewMenuModel(tm *theme.Manager) MenuModel {
 	options := []menuOption{
 		{"c", "Color Wheel", 1},
 		{"g", "Generate Palette", 2},
+		{"s", "Search Colors", 6},
 		{"l", "Learn Color Theory", 3},
 		{"a", "Check Accessibility (WCAG)", 4},
 		{"m", "Manage Palettes", 5},
@@ -66,6 +67,8 @@ func (m MenuModel) Update(msg tea.Msg) (MenuModel, tea.Cmd) {
 			return m, func() tea.Msg { return Navigate(1) }
 		case "g":
 			return m, func() tea.Msg { return Navigate(2) }
+		case "s":
+			return m, func() tea.Msg { return Navigate(6) }
 		case "l":
 			return m, func() tea.Msg { return Navigate(3) }
 		case "a":

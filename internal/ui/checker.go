@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/kyanite/prism/internal/clipboard"
 	"github.com/kyanite/prism/internal/color"
 	"github.com/kyanite/prism/internal/theme"
 	"github.com/kyanite/prism/internal/wcag"
@@ -19,6 +20,7 @@ type CheckerModel struct {
 	background   string
 	result       *wcag.ContrastResult
 	err          string
+	status       string
 }
 
 // NewCheckerModel creates a new checker model
@@ -43,10 +45,26 @@ func (m CheckerModel) Update(msg tea.Msg) (CheckerModel, tea.Cmd) {
 		switch msg.String() {
 		case "enter", " ":
 			return m, m.check()
+		case "c":
+			if m.result != nil {
+				m.copyResult()
+			}
 		}
 	}
 
 	return m, nil
+}
+
+func (m *CheckerModel) copyResult() {
+	text := fmt.Sprintf("Contrast: %.2f:1 - WCAG %s (FG: %s, BG: %s)",
+		m.result.Ratio, m.result.Level, m.foreground, m.background)
+
+	if err := clipboard.Copy(text); err == nil {
+		m.status = "✓ Copied contrast result to clipboard"
+	} else {
+		m.status = "✗ Clipboard unavailable"
+	}
+	m.err = ""
 }
 
 // View renders the checker
@@ -126,8 +144,19 @@ func (m CheckerModel) View() string {
 		b.WriteString("\n\n")
 	}
 
+	// Status
+	if m.status != "" {
+		b.WriteString(styles.Success.Render(m.status))
+		b.WriteString("\n\n")
+	}
+
 	// Help
-	help := styles.Muted.Render("Enter: Check Contrast • Esc: Menu")
+	var help string
+	if m.result != nil {
+		help = styles.Muted.Render("Enter: Check Contrast • C: Copy • Esc: Menu")
+	} else {
+		help = styles.Muted.Render("Enter: Check Contrast • Esc: Menu")
+	}
 	b.WriteString(help)
 
 	// Wrap in border
