@@ -1,12 +1,11 @@
-package tests
+package wcag
 
 import (
 	"math"
 	"testing"
 
-	"github.com/kyanite/prism/internal/color"
-	"github.com/kyanite/prism/internal/wcag"
-)
+	color "github.com/kyanite/prism/internal/color"
+	)
 
 func TestWCAGContrast(t *testing.T) {
 	tests := []struct {
@@ -64,12 +63,12 @@ func TestWCAGContrast(t *testing.T) {
 			fg, _ := color.ParseHex(tt.fg)
 			bg, _ := color.ParseHex(tt.bg)
 
-			ratio := wcag.CalculateContrast(fg, bg)
+			ratio := CalculateContrast(fg, bg)
 			if math.Abs(ratio-tt.wantRatio) > tt.tolerance {
 				t.Errorf("CalculateContrast() = %.2f, want %.2f (±%.2f)", ratio, tt.wantRatio, tt.tolerance)
 			}
 
-			result := wcag.Validate(fg, bg)
+			result := Validate(fg, bg)
 			if result.Level != tt.wantLevel {
 				t.Errorf("Level = %s, want %s", result.Level, tt.wantLevel)
 			}
@@ -94,16 +93,16 @@ func TestWCAGThresholds(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := wcag.IsPassingAASmall(tt.ratio); got != tt.wantAASmall {
+			if got := IsPassingAASmall(tt.ratio); got != tt.wantAASmall {
 				t.Errorf("IsPassingAASmall(%.1f) = %v, want %v", tt.ratio, got, tt.wantAASmall)
 			}
-			if got := wcag.IsPassingAALarge(tt.ratio); got != tt.wantAALarge {
+			if got := IsPassingAALarge(tt.ratio); got != tt.wantAALarge {
 				t.Errorf("IsPassingAALarge(%.1f) = %v, want %v", tt.ratio, got, tt.wantAALarge)
 			}
-			if got := wcag.IsPassingAAASmall(tt.ratio); got != tt.wantAAASmall {
+			if got := IsPassingAAASmall(tt.ratio); got != tt.wantAAASmall {
 				t.Errorf("IsPassingAAASmall(%.1f) = %v, want %v", tt.ratio, got, tt.wantAAASmall)
 			}
-			if got := wcag.IsPassingAAALarge(tt.ratio); got != tt.wantAAALarge {
+			if got := IsPassingAAALarge(tt.ratio); got != tt.wantAAALarge {
 				t.Errorf("IsPassingAAALarge(%.1f) = %v, want %v", tt.ratio, got, tt.wantAAALarge)
 			}
 		})
@@ -122,7 +121,7 @@ func TestRelativeLuminance(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := wcag.RelativeLuminance(tt.r, tt.g, tt.b)
+			got := RelativeLuminance(tt.r, tt.g, tt.b)
 			if math.Abs(got-tt.want) > 0.01 {
 				t.Errorf("RelativeLuminance(%d, %d, %d) = %.3f, want %.3f", tt.r, tt.g, tt.b, got, tt.want)
 			}
@@ -131,7 +130,7 @@ func TestRelativeLuminance(t *testing.T) {
 }
 
 func TestContrastResultSummary(t *testing.T) {
-	result := wcag.ContrastResult{
+	result := ContrastResult{
 		Ratio:     7.5,
 		Level:     "AAA",
 		PassedAA:  true,

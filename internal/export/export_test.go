@@ -1,4 +1,4 @@
-package tests
+package export
 
 import (
 	"encoding/json"
@@ -6,9 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kyanite/prism/internal/color"
-	"github.com/kyanite/prism/internal/export"
-	"github.com/kyanite/prism/internal/palette"
+	color "github.com/kyanite/prism/internal/color"
+		palette "github.com/kyanite/prism/internal/palette"
 )
 
 // createTestPalette creates a test palette for export tests
@@ -26,7 +25,7 @@ func TestExportIntegration(t *testing.T) {
 	pal := createTestPalette()
 
 	t.Run("ExportJSON", func(t *testing.T) {
-		data, err := export.ExportJSON(*pal)
+		data, err := ExportJSON(*pal)
 		if err != nil {
 			t.Fatalf("ExportJSON failed: %v", err)
 		}
@@ -59,7 +58,7 @@ func TestExportIntegration(t *testing.T) {
 	})
 
 	t.Run("ExportJSONCompact", func(t *testing.T) {
-		data, err := export.ExportJSONCompact(*pal)
+		data, err := ExportJSONCompact(*pal)
 		if err != nil {
 			t.Fatalf("ExportJSONCompact failed: %v", err)
 		}
@@ -78,7 +77,7 @@ func TestExportIntegration(t *testing.T) {
 	})
 
 	t.Run("ExportCSS", func(t *testing.T) {
-		css := export.ExportCSS(*pal)
+		css := ExportCSS(*pal)
 
 		// Verify CSS structure
 		if !strings.Contains(css, ":root {") {
@@ -118,7 +117,7 @@ func TestExportIntegration(t *testing.T) {
 	})
 
 	t.Run("ExportTOML", func(t *testing.T) {
-		toml := export.ExportTOML(*pal)
+		toml := ExportTOML(*pal)
 
 		// Verify TOML structure
 		if !strings.Contains(toml, "name =") {
@@ -151,7 +150,7 @@ func TestExportIntegration(t *testing.T) {
 	})
 
 	t.Run("ExportTheme", func(t *testing.T) {
-		data, err := export.ExportTheme(*pal)
+		data, err := ExportTheme(*pal)
 		if err != nil {
 			t.Fatalf("ExportTheme failed: %v", err)
 		}
@@ -203,11 +202,11 @@ func TestExportIntegration(t *testing.T) {
 func TestExportFormatsComparison(t *testing.T) {
 	pal := createTestPalette()
 
-	jsonData, _ := export.ExportJSON(*pal)
-	jsonCompact, _ := export.ExportJSONCompact(*pal)
-	css := export.ExportCSS(*pal)
-	toml := export.ExportTOML(*pal)
-	theme, _ := export.ExportTheme(*pal)
+	jsonData, _ := ExportJSON(*pal)
+	jsonCompact, _ := ExportJSONCompact(*pal)
+	css := ExportCSS(*pal)
+	toml := ExportTOML(*pal)
+	theme, _ := ExportTheme(*pal)
 
 	// All formats should contain the palette name
 	formats := map[string]string{
@@ -254,7 +253,7 @@ func TestExportEdgeCases(t *testing.T) {
 		}
 
 		// JSON export should work with empty colors
-		jsonData, err := export.ExportJSON(*emptyPal)
+		jsonData, err := ExportJSON(*emptyPal)
 		if err != nil {
 			t.Errorf("ExportJSON should handle empty palette: %v", err)
 		}
@@ -267,19 +266,19 @@ func TestExportEdgeCases(t *testing.T) {
 		}
 
 		// CSS export should work
-		css := export.ExportCSS(*emptyPal)
+		css := ExportCSS(*emptyPal)
 		if !strings.Contains(css, ":root {") {
 			t.Error("CSS should still have :root even with empty palette")
 		}
 
 		// TOML export should work
-		toml := export.ExportTOML(*emptyPal)
+		toml := ExportTOML(*emptyPal)
 		if !strings.Contains(toml, "name =") {
 			t.Error("TOML should contain name even with empty palette")
 		}
 
 		// Theme export should work
-		_, err = export.ExportTheme(*emptyPal)
+		_, err = ExportTheme(*emptyPal)
 		if err != nil {
 			t.Errorf("ExportTheme should handle empty palette: %v", err)
 		}
@@ -296,12 +295,12 @@ func TestExportEdgeCases(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		css := export.ExportCSS(*singlePal)
+		css := ExportCSS(*singlePal)
 		if !strings.Contains(css, "--color-primary: #FF0000") {
 			t.Error("CSS should contain the single color")
 		}
 
-		toml := export.ExportTOML(*singlePal)
+		toml := ExportTOML(*singlePal)
 		colorCount := strings.Count(toml, "[[colors]]")
 		if colorCount != 1 {
 			t.Errorf("TOML should have exactly 1 color, got %d", colorCount)
@@ -315,7 +314,7 @@ func TestExportEdgeCases(t *testing.T) {
 		pal.Description = "Test 'description' with symbols"
 
 		// JSON should handle special characters
-		jsonData, err := export.ExportJSON(pal)
+		jsonData, err := ExportJSON(pal)
 		if err != nil {
 			t.Fatalf("ExportJSON should handle special characters: %v", err)
 		}
@@ -327,7 +326,7 @@ func TestExportEdgeCases(t *testing.T) {
 		}
 
 		// CSS should handle special characters in comments
-		css := export.ExportCSS(pal)
+		css := ExportCSS(pal)
 		if !strings.Contains(css, "Test") {
 			t.Error("CSS should contain the palette name")
 		}
@@ -351,17 +350,17 @@ func TestExportEdgeCases(t *testing.T) {
 		}
 
 		// All exports should handle large palette
-		_, err := export.ExportJSON(*largePal)
+		_, err := ExportJSON(*largePal)
 		if err != nil {
 			t.Errorf("ExportJSON should handle large palette: %v", err)
 		}
 
-		css := export.ExportCSS(*largePal)
+		css := ExportCSS(*largePal)
 		if len(css) == 0 {
 			t.Error("CSS export should produce output for large palette")
 		}
 
-		toml := export.ExportTOML(*largePal)
+		toml := ExportTOML(*largePal)
 		colorCount := strings.Count(toml, "[[colors]]")
 		if colorCount != 20 {
 			t.Errorf("TOML should have 20 colors, got %d", colorCount)
@@ -374,7 +373,7 @@ func TestExportRoundTrip(t *testing.T) {
 	originalPal := createTestPalette()
 
 	// Export to JSON
-	jsonData, err := export.ExportJSON(*originalPal)
+	jsonData, err := ExportJSON(*originalPal)
 	if err != nil {
 		t.Fatalf("ExportJSON failed: %v", err)
 	}

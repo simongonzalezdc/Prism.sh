@@ -1,4 +1,4 @@
-package tests
+package storage
 
 import (
 	"os"
@@ -6,10 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kyanite/prism/internal/color"
-	"github.com/kyanite/prism/internal/palette"
-	"github.com/kyanite/prism/internal/storage"
-)
+	color "github.com/kyanite/prism/internal/color"
+	palette "github.com/kyanite/prism/internal/palette"
+	)
 
 // TestStorageIntegration tests complete storage workflows
 func TestStorageIntegration(t *testing.T) {
@@ -33,19 +32,19 @@ func TestStorageIntegration(t *testing.T) {
 
 	t.Run("ConfigSaveAndLoad", func(t *testing.T) {
 		// Create and save a config
-		cfg := &storage.Config{
+		cfg := &Config{
 			Theme:            "custom-theme",
 			AutoSave:         true,
 			AutoSaveInterval: 60,
 		}
 
-		err := storage.SaveConfig(cfg)
+		err := SaveConfig(cfg)
 		if err != nil {
 			t.Fatalf("SaveConfig failed: %v", err)
 		}
 
 		// Load the config
-		loadedCfg, err := storage.LoadConfig()
+		loadedCfg, err := LoadConfig()
 		if err != nil {
 			t.Fatalf("LoadConfig failed: %v", err)
 		}
@@ -64,16 +63,16 @@ func TestStorageIntegration(t *testing.T) {
 
 	t.Run("DefaultConfig", func(t *testing.T) {
 		// Remove config file if it exists
-		configDir, _ := storage.GetConfigDir()
+		configDir, _ := GetConfigDir()
 		os.RemoveAll(configDir)
 
 		// Load config should return default when file doesn't exist
-		cfg, err := storage.LoadConfig()
+		cfg, err := LoadConfig()
 		if err != nil {
 			t.Fatalf("LoadConfig failed: %v", err)
 		}
 
-		defaultCfg := storage.DefaultConfig()
+		defaultCfg := DefaultConfig()
 		if cfg.Theme != defaultCfg.Theme {
 			t.Errorf("Theme = %s, want %s", cfg.Theme, defaultCfg.Theme)
 		}
@@ -88,13 +87,13 @@ func TestStorageIntegration(t *testing.T) {
 		pal.Tags = []string{"test", "triadic"}
 
 		// Save palette
-		err := storage.SavePalette(pal)
+		err := SavePalette(pal)
 		if err != nil {
 			t.Fatalf("SavePalette failed: %v", err)
 		}
 
 		// Load palette
-		loadedPal, err := storage.LoadPalette(pal.ID)
+		loadedPal, err := LoadPalette(pal.ID)
 		if err != nil {
 			t.Fatalf("LoadPalette failed: %v", err)
 		}
@@ -114,13 +113,13 @@ func TestStorageIntegration(t *testing.T) {
 		}
 
 		// Delete palette
-		err = storage.DeletePalette(pal.ID)
+		err = DeletePalette(pal.ID)
 		if err != nil {
 			t.Fatalf("DeletePalette failed: %v", err)
 		}
 
 		// Verify palette is deleted
-		_, err = storage.LoadPalette(pal.ID)
+		_, err = LoadPalette(pal.ID)
 		if err == nil {
 			t.Error("LoadPalette should fail after delete")
 		}
@@ -128,7 +127,7 @@ func TestStorageIntegration(t *testing.T) {
 
 	t.Run("ListPalettes", func(t *testing.T) {
 		// Clean up any existing palettes
-		configDir, _ := storage.GetConfigDir()
+		configDir, _ := GetConfigDir()
 		palettesDir := filepath.Join(configDir, "palettes")
 		os.RemoveAll(palettesDir)
 
@@ -146,14 +145,14 @@ func TestStorageIntegration(t *testing.T) {
 			pal.Name = string(rule)
 			palettes = append(palettes, pal)
 
-			err := storage.SavePalette(pal)
+			err := SavePalette(pal)
 			if err != nil {
 				t.Fatalf("SavePalette %d failed: %v", i, err)
 			}
 		}
 
 		// List all palettes
-		loadedPalettes, err := storage.ListPalettes()
+		loadedPalettes, err := ListPalettes()
 		if err != nil {
 			t.Fatalf("ListPalettes failed: %v", err)
 		}
@@ -165,7 +164,7 @@ func TestStorageIntegration(t *testing.T) {
 
 		// Clean up
 		for _, pal := range palettes {
-			storage.DeletePalette(pal.ID)
+			DeletePalette(pal.ID)
 		}
 	})
 
@@ -173,7 +172,7 @@ func TestStorageIntegration(t *testing.T) {
 		testFile := filepath.Join(tmpDir, "atomic-test.txt")
 		testData := []byte("test data for atomic write")
 
-		err := storage.AtomicWrite(testFile, testData)
+		err := AtomicWrite(testFile, testData)
 		if err != nil {
 			t.Fatalf("AtomicWrite failed: %v", err)
 		}
@@ -198,7 +197,7 @@ func TestStorageIntegration(t *testing.T) {
 				baseColor, _ := color.ParseHex("#FF5733")
 				pal, _ := palette.Generate(baseColor, palette.Triadic)
 				pal.Name = "Concurrent Test"
-				err := storage.SavePalette(pal)
+				err := SavePalette(pal)
 				if err != nil {
 					t.Errorf("Concurrent SavePalette %d failed: %v", index, err)
 				}
@@ -216,14 +215,14 @@ func TestStorageIntegration(t *testing.T) {
 // TestStorageErrorHandling tests error conditions
 func TestStorageErrorHandling(t *testing.T) {
 	t.Run("LoadNonexistentPalette", func(t *testing.T) {
-		_, err := storage.LoadPalette("nonexistent-id-12345")
+		_, err := LoadPalette("nonexistent-id-12345")
 		if err == nil {
 			t.Error("LoadPalette should fail for nonexistent palette")
 		}
 	})
 
 	t.Run("DeleteNonexistentPalette", func(t *testing.T) {
-		err := storage.DeletePalette("nonexistent-id-12345")
+		err := DeletePalette("nonexistent-id-12345")
 		if err == nil {
 			t.Error("DeletePalette should fail for nonexistent palette")
 		}
@@ -248,7 +247,7 @@ func TestStorageErrorHandling(t *testing.T) {
 			}
 		}()
 
-		palettes, err := storage.ListPalettes()
+		palettes, err := ListPalettes()
 		if err != nil {
 			t.Fatalf("ListPalettes should not fail on empty directory: %v", err)
 		}
@@ -283,7 +282,7 @@ func TestPaletteVersioning(t *testing.T) {
 	originalName := "Original Name"
 	pal.Name = originalName
 
-	err = storage.SavePalette(pal)
+	err = SavePalette(pal)
 	if err != nil {
 		t.Fatalf("SavePalette failed: %v", err)
 	}
@@ -294,13 +293,13 @@ func TestPaletteVersioning(t *testing.T) {
 	// Update the palette
 	pal.Name = "Updated Name"
 	pal.UpdatedAt = time.Now()
-	err = storage.SavePalette(pal)
+	err = SavePalette(pal)
 	if err != nil {
 		t.Fatalf("SavePalette (update) failed: %v", err)
 	}
 
 	// Load and verify update
-	loadedPal, err := storage.LoadPalette(pal.ID)
+	loadedPal, err := LoadPalette(pal.ID)
 	if err != nil {
 		t.Fatalf("LoadPalette failed: %v", err)
 	}

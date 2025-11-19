@@ -1,20 +1,19 @@
-package tests
+package ui
 
 import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/kyanite/prism/internal/palette"
-	"github.com/kyanite/prism/internal/theme"
-	"github.com/kyanite/prism/internal/ui"
-)
+	palette "github.com/kyanite/prism/internal/palette"
+	theme "github.com/kyanite/prism/internal/theme"
+	)
 
 // TestUIModelInitialization tests UI model creation and initialization
 func TestUIModelInitialization(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("GeneratorModel", func(t *testing.T) {
-		model := ui.NewGeneratorModel(tm)
+		model := NewGeneratorModel(tm)
 
 		// Verify initial state
 		if model.Init() != nil {
@@ -31,7 +30,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("CheckerModel", func(t *testing.T) {
-		model := ui.NewCheckerModel(tm)
+		model := NewCheckerModel(tm)
 
 		if model.Init() != nil {
 			t.Error("CheckerModel.Init() should return nil")
@@ -46,7 +45,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("MenuModel", func(t *testing.T) {
-		model := ui.NewMenuModel(tm)
+		model := NewMenuModel(tm)
 
 		if model.Init() != nil {
 			t.Error("MenuModel.Init() should return nil")
@@ -61,7 +60,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("SearchModel", func(t *testing.T) {
-		model := ui.NewSearchModel(tm)
+		model := NewSearchModel(tm)
 
 		if model.Init() != nil {
 			t.Error("SearchModel.Init() should return nil")
@@ -76,7 +75,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("ManagerModel", func(t *testing.T) {
-		model := ui.NewManagerModel(tm)
+		model := NewManagerModel(tm)
 
 		// Init may return a command for loading palettes
 		cmd := model.Init()
@@ -94,7 +93,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("WheelModel", func(t *testing.T) {
-		model := ui.NewWheelModel(tm)
+		model := NewWheelModel(tm)
 
 		if model.Init() != nil {
 			t.Error("WheelModel.Init() should return nil")
@@ -109,7 +108,7 @@ func TestUIModelInitialization(t *testing.T) {
 	})
 
 	t.Run("TheoryModel", func(t *testing.T) {
-		model := ui.NewTheoryModel(tm)
+		model := NewTheoryModel(tm)
 
 		if model.Init() != nil {
 			t.Error("TheoryModel.Init() should return nil")
@@ -129,7 +128,7 @@ func TestUIModelNavigation(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("MenuNavigation", func(t *testing.T) {
-		model := ui.NewMenuModel(tm)
+		model := NewMenuModel(tm)
 
 		// Simulate down key
 		msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}}
@@ -145,7 +144,7 @@ func TestUIModelNavigation(t *testing.T) {
 	})
 
 	t.Run("GeneratorRuleSelection", func(t *testing.T) {
-		model := ui.NewGeneratorModel(tm)
+		model := NewGeneratorModel(tm)
 
 		// Navigate through rules
 		for i := 0; i < 3; i++ {
@@ -172,13 +171,13 @@ func TestUIModelRendering(t *testing.T) {
 		name  string
 		model interface{ View() string }
 	}{
-		{"GeneratorModel", ui.NewGeneratorModel(tm)},
-		{"CheckerModel", ui.NewCheckerModel(tm)},
-		{"MenuModel", ui.NewMenuModel(tm)},
-		{"SearchModel", ui.NewSearchModel(tm)},
-		{"ManagerModel", ui.NewManagerModel(tm)},
-		{"WheelModel", ui.NewWheelModel(tm)},
-		{"TheoryModel", ui.NewTheoryModel(tm)},
+		{"GeneratorModel", NewGeneratorModel(tm)},
+		{"CheckerModel", NewCheckerModel(tm)},
+		{"MenuModel", NewMenuModel(tm)},
+		{"SearchModel", NewSearchModel(tm)},
+		{"ManagerModel", NewManagerModel(tm)},
+		{"WheelModel", NewWheelModel(tm)},
+		{"TheoryModel", NewTheoryModel(tm)},
 	}
 
 	for _, m := range models {
@@ -217,7 +216,7 @@ func TestUIThemeIntegration(t *testing.T) {
 
 	t.Run("StylesCreation", func(t *testing.T) {
 		currentTheme := tm.CurrentTheme()
-		styles := ui.NewStyles(currentTheme)
+		styles := NewStyles(currentTheme)
 
 		// Styles should be created without panic
 		_ = styles
@@ -236,7 +235,7 @@ func TestUIThemeIntegration(t *testing.T) {
 			}
 
 			// Create styles for each theme
-			_ = ui.NewStyles(&themes[i])
+			_ = NewStyles(&themes[i])
 		}
 	})
 
@@ -275,7 +274,7 @@ func TestUIModelInteractions(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("GeneratorKeyHandling", func(t *testing.T) {
-		model := ui.NewGeneratorModel(tm)
+		model := NewGeneratorModel(tm)
 
 		// Test various key presses
 		keys := []string{"j", "k", "enter", "c", "s", "e", "q"}
@@ -290,7 +289,7 @@ func TestUIModelInteractions(t *testing.T) {
 	})
 
 	t.Run("CheckerKeyHandling", func(t *testing.T) {
-		model := ui.NewCheckerModel(tm)
+		model := NewCheckerModel(tm)
 
 		keys := []string{"enter", "c", "q"}
 
@@ -307,7 +306,7 @@ func TestUINavigateMessage(t *testing.T) {
 	screens := []int{0, 1, 2, 3, 4, 5, 6}
 
 	for _, screen := range screens {
-		msg := ui.Navigate(screen)
+		msg := Navigate(screen)
 
 		// Should create a valid message
 		if msg.Screen != screen {
@@ -322,7 +321,7 @@ func TestUIHelperFunctions(t *testing.T) {
 
 	t.Run("RenderHelp", func(t *testing.T) {
 		// RenderHelp requires theme manager and dimensions
-		helpText := ui.RenderHelp(tm, 80, 24)
+		helpText := RenderHelp(tm, 80, 24)
 
 		if helpText == "" {
 			t.Error("RenderHelp should return non-empty string")
@@ -335,7 +334,7 @@ func TestUIModelStatePersistence(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("SearchModelQueryPersistence", func(t *testing.T) {
-		model := ui.NewSearchModel(tm)
+		model := NewSearchModel(tm)
 
 		// Simulate typing (this is a simplified test)
 		// In real usage, the model would receive character inputs
@@ -351,7 +350,7 @@ func TestUIModelStatePersistence(t *testing.T) {
 	})
 
 	t.Run("ManagerModelListPersistence", func(t *testing.T) {
-		model := ui.NewManagerModel(tm)
+		model := NewManagerModel(tm)
 
 		// Initialize (may load palettes)
 		cmd := model.Init()
@@ -375,7 +374,7 @@ func TestUIModelEdgeCases(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("UnknownKeyPress", func(t *testing.T) {
-		model := ui.NewGeneratorModel(tm)
+		model := NewGeneratorModel(tm)
 
 		// Send unknown key
 		msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'~'}}
@@ -386,7 +385,7 @@ func TestUIModelEdgeCases(t *testing.T) {
 	})
 
 	t.Run("WindowSizeMessage", func(t *testing.T) {
-		model := ui.NewGeneratorModel(tm)
+		model := NewGeneratorModel(tm)
 
 		// Send window size message
 		msg := tea.WindowSizeMsg{Width: 80, Height: 24}
@@ -397,7 +396,7 @@ func TestUIModelEdgeCases(t *testing.T) {
 	})
 
 	t.Run("RapidKeyPresses", func(t *testing.T) {
-		model := ui.NewMenuModel(tm)
+		model := NewMenuModel(tm)
 
 		// Simulate rapid navigation
 		for i := 0; i < 100; i++ {
@@ -420,7 +419,7 @@ func TestUIModelWithRealData(t *testing.T) {
 	tm := theme.NewManager()
 
 	t.Run("TheoryModelWithPalette", func(t *testing.T) {
-		model := ui.NewTheoryModel(tm)
+		model := NewTheoryModel(tm)
 
 		// Theory model should work with default data
 		_ = model.View()
@@ -434,7 +433,7 @@ func TestUIModelWithRealData(t *testing.T) {
 	})
 
 	t.Run("WheelModelRendering", func(t *testing.T) {
-		model := ui.NewWheelModel(tm)
+		model := NewWheelModel(tm)
 
 		// Wheel model should render the color wheel
 		output := model.View()
@@ -449,7 +448,7 @@ func TestUIModelWithRealData(t *testing.T) {
 // TestHarmonyRuleDisplay tests that all harmony rules can be displayed
 func TestHarmonyRuleDisplay(t *testing.T) {
 	tm := theme.NewManager()
-	model := ui.NewGeneratorModel(tm)
+	model := NewGeneratorModel(tm)
 
 	allRules := palette.AllRules()
 
