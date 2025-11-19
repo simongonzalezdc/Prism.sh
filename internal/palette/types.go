@@ -1,3 +1,6 @@
+// Package palette provides color palette generation using color theory harmony rules.
+// It implements classical color harmony algorithms including monochromatic, complementary,
+// analogous, triadic, tetradic, split-complementary, and square harmonies.
 package palette
 
 import (
@@ -6,7 +9,8 @@ import (
 	"github.com/kyanite/prism/internal/color"
 )
 
-// Palette represents a color palette
+// Palette represents a color palette with metadata and harmony information.
+// It contains a collection of colors generated from a base color using a specific harmony rule.
 type Palette struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`

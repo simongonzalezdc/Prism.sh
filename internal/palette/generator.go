@@ -37,7 +37,7 @@ func Generate(baseColor color.Color, rule HarmonyRule) (Palette, error) {
 	case Square:
 		palette.Colors = GenerateSquare(baseColor)
 	default:
-		return palette, fmt.Errorf("unknown harmony rule: %s", rule)
+		return palette, fmt.Errorf("unknown harmony rule '%s': must be one of: monochromatic, complementary, analogous, triadic, tetradic, split-complementary, square", rule)
 	}
 
 	return palette, nil

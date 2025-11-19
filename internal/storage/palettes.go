@@ -72,7 +72,8 @@ func ListPalettes() ([]palette.Palette, error) {
 		return nil, fmt.Errorf("failed to read palettes dir: %w", err)
 	}
 
-	palettes := []palette.Palette{}
+	// Pre-allocate based on file count for better performance
+	palettes := make([]palette.Palette, 0, len(files))
 	for _, file := range files {
 		if file.IsDir() || filepath.Ext(file.Name()) != ".json" {
 			continue

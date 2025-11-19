@@ -38,23 +38,24 @@ type HSV struct {
 // ParseHex creates a Color from hex string
 func ParseHex(hex string) (Color, error) {
 	// Remove # if present
+	original := hex
 	hex = strings.TrimPrefix(hex, "#")
 
 	if len(hex) != 6 {
-		return Color{}, fmt.Errorf("invalid hex color: %s", hex)
+		return Color{}, fmt.Errorf("invalid hex color '%s': must be 6 characters (e.g., #FF5733 or FF5733), got %d characters", original, len(hex))
 	}
 
 	r, err := strconv.ParseInt(hex[0:2], 16, 0)
 	if err != nil {
-		return Color{}, err
+		return Color{}, fmt.Errorf("invalid hex color '%s': red component '%s' is not valid hexadecimal", original, hex[0:2])
 	}
 	g, err := strconv.ParseInt(hex[2:4], 16, 0)
 	if err != nil {
-		return Color{}, err
+		return Color{}, fmt.Errorf("invalid hex color '%s': green component '%s' is not valid hexadecimal", original, hex[2:4])
 	}
 	b, err := strconv.ParseInt(hex[4:6], 16, 0)
 	if err != nil {
-		return Color{}, err
+		return Color{}, fmt.Errorf("invalid hex color '%s': blue component '%s' is not valid hexadecimal", original, hex[4:6])
 	}
 
 	rgb := RGB{R: int(r), G: int(g), B: int(b)}

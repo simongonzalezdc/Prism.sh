@@ -1,3 +1,5 @@
+// Package color provides color representation, conversion, and manipulation utilities.
+// It supports RGB, HSL, and HSV color spaces with accurate conversion algorithms.
 package color
 
 import (
@@ -5,12 +7,16 @@ import (
 	"math"
 )
 
-// RGBToHex converts RGB to hex string
+// RGBToHex converts RGB color values to a hexadecimal color code.
+// Parameters r, g, b should be in range 0-255.
+// Returns a 7-character hex string (e.g., "#FF5733").
 func RGBToHex(r, g, b int) string {
 	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
 }
 
-// RGBToHSL converts RGB (0-255) to HSL
+// RGBToHSL converts RGB color values (0-255) to HSL color space.
+// Returns HSL with H in range 0-360, S and L in range 0-100.
+// Uses the standard HSL conversion algorithm with proper handling of edge cases.
 func RGBToHSL(rgb RGB) HSL {
 	r := float64(rgb.R) / 255.0
 	g := float64(rgb.G) / 255.0

@@ -55,7 +55,8 @@ func SearchColors(query string) []NamedColor {
 	defer mu.RUnlock()
 
 	query = strings.ToLower(query)
-	results := []NamedColor{}
+	// Pre-allocate with reasonable capacity for search results
+	results := make([]NamedColor, 0, 20)
 
 	// Exact matches first
 	for _, c := range db.Colors {

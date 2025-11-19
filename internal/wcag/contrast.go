@@ -1,3 +1,10 @@
+// Package wcag implements WCAG 2.1 (Web Content Accessibility Guidelines) contrast algorithms.
+// It provides accurate contrast ratio calculations using relative luminance with gamma correction,
+// and validates color combinations against AA and AAA accessibility standards.
+//
+// WCAG 2.1 Requirements:
+// - Level AA: Minimum contrast ratio of 4.5:1 for normal text, 3:1 for large text
+// - Level AAA: Minimum contrast ratio of 7:1 for normal text, 4.5:1 for large text
 package wcag
 
 import (
@@ -7,7 +14,8 @@ import (
 	"github.com/kyanite/prism/internal/color"
 )
 
-// ContrastResult represents the result of a contrast calculation
+// ContrastResult represents the result of a WCAG contrast calculation.
+// It includes the contrast ratio, compliance level, and pass/fail status for AA and AAA standards.
 type ContrastResult struct {
 	Ratio       float64
 	Level       string // "AAA", "AA", "FAIL"
