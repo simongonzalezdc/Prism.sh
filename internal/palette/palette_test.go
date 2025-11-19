@@ -1,32 +1,31 @@
-package tests
+package palette
 
 import (
 	"math"
 	"testing"
 
-	"github.com/kyanite/prism/internal/color"
-	"github.com/kyanite/prism/internal/palette"
-)
+	color "github.com/kyanite/prism/internal/color"
+	)
 
 func TestPaletteGeneration(t *testing.T) {
 	baseColor := color.NewFromHSL(180, 100, 50) // Cyan
 
 	tests := []struct {
-		rule          palette.HarmonyRule
+		rule          HarmonyRule
 		expectedCount int
 	}{
-		{palette.Monochromatic, 5},
-		{palette.Complementary, 2},
-		{palette.Analogous, 3},
-		{palette.Triadic, 3},
-		{palette.Tetradic, 4},
-		{palette.SplitComplementary, 3},
-		{palette.Square, 4},
+		{Monochromatic, 5},
+		{Complementary, 2},
+		{Analogous, 3},
+		{Triadic, 3},
+		{Tetradic, 4},
+		{SplitComplementary, 3},
+		{Square, 4},
 	}
 
 	for _, tt := range tests {
 		t.Run(string(tt.rule), func(t *testing.T) {
-			pal, err := palette.Generate(baseColor, tt.rule)
+			pal, err := Generate(baseColor, tt.rule)
 			if err != nil {
 				t.Fatalf("Generate() error = %v", err)
 			}
@@ -45,7 +44,7 @@ func TestPaletteGeneration(t *testing.T) {
 func TestTriadicAngles(t *testing.T) {
 	baseColor := color.NewFromHSL(0, 100, 50) // Red at 0°
 
-	pal, err := palette.Generate(baseColor, palette.Triadic)
+	pal, err := Generate(baseColor, Triadic)
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
@@ -62,7 +61,7 @@ func TestTriadicAngles(t *testing.T) {
 func TestComplementaryAngles(t *testing.T) {
 	baseColor := color.NewFromHSL(30, 100, 50) // Orange at 30°
 
-	pal, err := palette.Generate(baseColor, palette.Complementary)
+	pal, err := Generate(baseColor, Complementary)
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
@@ -88,7 +87,7 @@ func TestComplementaryAngles(t *testing.T) {
 func TestAnalogousAngles(t *testing.T) {
 	baseColor := color.NewFromHSL(180, 100, 50) // Cyan at 180°
 
-	pal, err := palette.Generate(baseColor, palette.Analogous)
+	pal, err := Generate(baseColor, Analogous)
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
@@ -109,7 +108,7 @@ func TestAnalogousAngles(t *testing.T) {
 func TestMonochromaticLightness(t *testing.T) {
 	baseColor := color.NewFromHSL(0, 100, 50) // Red
 
-	pal, err := palette.Generate(baseColor, palette.Monochromatic)
+	pal, err := Generate(baseColor, Monochromatic)
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
@@ -134,21 +133,21 @@ func TestMonochromaticLightness(t *testing.T) {
 }
 
 func TestAllRules(t *testing.T) {
-	rules := palette.AllRules()
+	rules := AllRules()
 
 	if len(rules) != 7 {
 		t.Errorf("AllRules() returned %d rules, want 7", len(rules))
 	}
 
 	// Check all expected rules are present
-	expected := map[palette.HarmonyRule]bool{
-		palette.Monochromatic:      true,
-		palette.Complementary:      true,
-		palette.Analogous:          true,
-		palette.Triadic:            true,
-		palette.Tetradic:           true,
-		palette.SplitComplementary: true,
-		palette.Square:             true,
+	expected := map[HarmonyRule]bool{
+		Monochromatic:      true,
+		Complementary:      true,
+		Analogous:          true,
+		Triadic:            true,
+		Tetradic:           true,
+		SplitComplementary: true,
+		Square:             true,
 	}
 
 	for _, rule := range rules {
