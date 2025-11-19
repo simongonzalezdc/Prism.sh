@@ -1,5 +1,6 @@
 # Binaries
 bin/
+prism
 *.exe
 *.exe~
 *.dll
@@ -12,6 +13,7 @@ bin/
 # Output of the go coverage tool
 *.out
 coverage.out
+coverage.html
 
 # Go workspace file
 go.work

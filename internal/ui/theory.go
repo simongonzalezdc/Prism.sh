@@ -95,20 +95,17 @@ func (m TheoryModel) Update(msg tea.Msg) (TheoryModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the theory screen
 func (m TheoryModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
 	// Title
-	title := m.styles.Title.Render("Color Theory Lessons")
+	title := styles.Title.Render("Color Theory Lessons")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
@@ -116,25 +113,25 @@ func (m TheoryModel) View() string {
 		// Show lesson content
 		lesson := m.lessons[m.selected]
 
-		lessonTitle := m.styles.Primary.Bold(true).Render(lesson.title)
+		lessonTitle := styles.Primary.Bold(true).Render(lesson.title)
 		b.WriteString(lessonTitle)
 		b.WriteString("\n\n")
 
 		b.WriteString(lesson.content)
 		b.WriteString("\n\n")
 
-		help := m.styles.Muted.Render("Enter: Back to list • Esc: Menu")
+		help := styles.Muted.Render("Enter: Back to list • Esc: Menu")
 		b.WriteString(help)
 	} else {
 		// Show lesson list
-		b.WriteString(m.styles.Secondary.Render("Select a lesson:"))
+		b.WriteString(styles.Secondary.Render("Select a lesson:"))
 		b.WriteString("\n")
 
 		for i, lesson := range m.lessons {
-			style := m.styles.Unselected
+			style := styles.Unselected
 			cursor := "  "
 			if i == m.selected {
-				style = m.styles.Selected
+				style = styles.Selected
 				cursor = "▸ "
 			}
 
@@ -144,12 +141,12 @@ func (m TheoryModel) View() string {
 		}
 
 		b.WriteString("\n")
-		help := m.styles.Muted.Render("↑/↓: Navigate • Enter: View • Esc: Menu")
+		help := styles.Muted.Render("↑/↓: Navigate • Enter: View • Esc: Menu")
 		b.WriteString(help)
 	}
 
 	// Wrap in border
-	content := m.styles.Border.Width(70).Render(b.String())
+	content := styles.Border.Width(ContentWidth).Render(b.String())
 
-	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
+	return lipgloss.Place(ScreenWidth, ScreenHeight, lipgloss.Center, lipgloss.Center, content)
 }

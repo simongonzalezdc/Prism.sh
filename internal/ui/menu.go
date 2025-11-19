@@ -28,6 +28,7 @@ func NewMenuModel(tm *theme.Manager) MenuModel {
 	options := []menuOption{
 		{"c", "Color Wheel", 1},
 		{"g", "Generate Palette", 2},
+		{"s", "Search Colors", 6},
 		{"l", "Learn Color Theory", 3},
 		{"a", "Check Accessibility (WCAG)", 4},
 		{"m", "Manage Palettes", 5},
@@ -66,6 +67,8 @@ func (m MenuModel) Update(msg tea.Msg) (MenuModel, tea.Cmd) {
 			return m, func() tea.Msg { return Navigate(1) }
 		case "g":
 			return m, func() tea.Msg { return Navigate(2) }
+		case "s":
+			return m, func() tea.Msg { return Navigate(6) }
 		case "l":
 			return m, func() tea.Msg { return Navigate(3) }
 		case "a":
@@ -77,15 +80,12 @@ func (m MenuModel) Update(msg tea.Msg) (MenuModel, tea.Cmd) {
 		}
 	}
 
-	// Refresh styles if theme changed
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
-
 	return m, nil
 }
 
 // View renders the menu
 func (m MenuModel) View() string {
-	m.styles = NewStyles(m.themeManager.CurrentTheme())
+	styles := NewStyles(m.themeManager.CurrentTheme())
 
 	var b strings.Builder
 
@@ -103,10 +103,10 @@ func (m MenuModel) View() string {
 
 	// Menu options
 	for i, opt := range m.options {
-		style := m.styles.Unselected
+		style := styles.Unselected
 		cursor := "  "
 		if i == m.selected {
-			style = m.styles.Selected
+			style = styles.Selected
 			cursor = "▸ "
 		}
 
@@ -118,13 +118,13 @@ func (m MenuModel) View() string {
 	b.WriteString("\n")
 
 	// Help text
-	help := m.styles.Muted.Render("↑/↓: Navigate • Enter: Select • Ctrl+H: Help • Ctrl+Q: Quit")
+	help := styles.Muted.Render("↑/↓: Navigate • Enter: Select • Ctrl+H: Help • Ctrl+Q: Quit")
 	b.WriteString(help)
 
 	// Wrap in border
-	content := m.styles.Border.Width(60).Render(b.String())
+	content := styles.Border.Width(ContentWidthNarrow).Render(b.String())
 
-	return lipgloss.Place(80, 24, lipgloss.Center, lipgloss.Center, content)
+	return lipgloss.Place(ScreenWidth, ScreenHeight, lipgloss.Center, lipgloss.Center, content)
 }
 
 // navigate returns a command to navigate to the selected screen

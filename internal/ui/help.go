@@ -41,6 +41,29 @@ func RenderHelp(tm *theme.Manager, width, height int) string {
 	b.WriteString(renderShortcut(styles, "←/→", "Change hue"))
 	b.WriteString(renderShortcut(styles, "↑/↓", "Change lightness"))
 	b.WriteString(renderShortcut(styles, "+/-", "Change saturation"))
+	b.WriteString(renderShortcut(styles, "C", "Copy color to clipboard"))
+	b.WriteString("\n")
+
+	b.WriteString(styles.Primary.Render("Palette Generator:"))
+	b.WriteString("\n")
+	b.WriteString(renderShortcut(styles, "↑/↓", "Select harmony rule"))
+	b.WriteString(renderShortcut(styles, "Enter", "Generate palette"))
+	b.WriteString(renderShortcut(styles, "C", "Copy palette colors"))
+	b.WriteString(renderShortcut(styles, "S", "Save palette"))
+	b.WriteString(renderShortcut(styles, "E", "Export palette"))
+	b.WriteString("\n")
+
+	b.WriteString(styles.Primary.Render("WCAG Checker:"))
+	b.WriteString("\n")
+	b.WriteString(renderShortcut(styles, "Enter", "Check contrast"))
+	b.WriteString(renderShortcut(styles, "C", "Copy result to clipboard"))
+	b.WriteString("\n")
+
+	b.WriteString(styles.Primary.Render("Color Search:"))
+	b.WriteString("\n")
+	b.WriteString(renderShortcut(styles, "Type", "Search colors by name"))
+	b.WriteString(renderShortcut(styles, "↑/↓", "Navigate results"))
+	b.WriteString(renderShortcut(styles, "C", "Copy selected color"))
 	b.WriteString("\n")
 
 	b.WriteString(styles.Primary.Render("Palette Manager:"))
@@ -55,7 +78,7 @@ func RenderHelp(tm *theme.Manager, width, height int) string {
 	b.WriteString(footer)
 
 	// Wrap in border
-	content := styles.Border.Width(60).Render(b.String())
+	content := styles.Border.Width(ContentWidthNarrow).Render(b.String())
 
 	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, content)
 }

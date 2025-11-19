@@ -3,7 +3,6 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -12,14 +11,6 @@ import (
 
 // SavePalette saves a palette to disk
 func SavePalette(p palette.Palette) error {
-	// TODO: Implement palette saving with file locking
-	// 1. Get config directory + /palettes/
-	// 2. Create directory if needed
-	// 3. Acquire file lock
-	// 4. Marshal palette to JSON
-	// 5. Use AtomicWrite to save
-	// 6. Release lock
-	// 7. Handle errors gracefully
 
 	configDir, err := GetConfigDir()
 	if err != nil {
@@ -43,12 +34,6 @@ func SavePalette(p palette.Palette) error {
 
 // LoadPalette loads a palette from disk
 func LoadPalette(id string) (*palette.Palette, error) {
-	// TODO: Implement palette loading
-	// 1. Get config directory + /palettes/
-	// 2. Read {id}.json file
-	// 3. Unmarshal JSON
-	// 4. Return palette
-	// 5. Handle missing files gracefully
 
 	configDir, err := GetConfigDir()
 	if err != nil {
@@ -56,7 +41,7 @@ func LoadPalette(id string) (*palette.Palette, error) {
 	}
 
 	filename := filepath.Join(configDir, "palettes", id+".json")
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read palette: %w", err)
 	}
@@ -72,12 +57,6 @@ func LoadPalette(id string) (*palette.Palette, error) {
 
 // ListPalettes lists all saved palettes
 func ListPalettes() ([]palette.Palette, error) {
-	// TODO: Implement palette listing
-	// 1. Get config directory + /palettes/
-	// 2. List all .json files
-	// 3. Load each palette
-	// 4. Return slice of palettes
-	// 5. Skip corrupted files (log error, don't crash)
 
 	configDir, err := GetConfigDir()
 	if err != nil {
@@ -85,7 +64,7 @@ func ListPalettes() ([]palette.Palette, error) {
 	}
 
 	palettesDir := filepath.Join(configDir, "palettes")
-	files, err := ioutil.ReadDir(palettesDir)
+	files, err := os.ReadDir(palettesDir)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []palette.Palette{}, nil
@@ -93,9 +72,10 @@ func ListPalettes() ([]palette.Palette, error) {
 		return nil, fmt.Errorf("failed to read palettes dir: %w", err)
 	}
 
-	palettes := []palette.Palette{}
+	// Pre-allocate based on file count for better performance
+	palettes := make([]palette.Palette, 0, len(files))
 	for _, file := range files {
-		if filepath.Ext(file.Name()) != ".json" {
+		if file.IsDir() || filepath.Ext(file.Name()) != ".json" {
 			continue
 		}
 
@@ -113,10 +93,6 @@ func ListPalettes() ([]palette.Palette, error) {
 
 // DeletePalette deletes a palette from disk
 func DeletePalette(id string) error {
-	// TODO: Implement palette deletion
-	// 1. Get config directory + /palettes/
-	// 2. Delete {id}.json file
-	// 3. Handle missing files gracefully
 
 	configDir, err := GetConfigDir()
 	if err != nil {

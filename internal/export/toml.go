@@ -9,7 +9,6 @@ import (
 
 // ExportTOML exports palette to TOML format
 func ExportTOML(p palette.Palette) string {
-	// TODO: Implement TOML export per PRD specification
 
 	var sb strings.Builder
 

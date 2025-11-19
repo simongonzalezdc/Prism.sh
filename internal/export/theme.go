@@ -16,7 +16,6 @@ type KyaniteTheme struct {
 
 // ExportTheme exports palette in Kyanite theme format
 func ExportTheme(p palette.Palette) ([]byte, error) {
-	// TODO: Implement Kyanite theme export per PRD specification
 
 	theme := KyaniteTheme{
 		Name:           p.Name,

@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -15,9 +14,6 @@ type FileLock struct {
 
 // LockFile acquires an advisory lock on a file
 func LockFile(path string) (*FileLock, error) {
-	// TODO: Implement cross-platform file locking
-	// - Linux/macOS: Use golang.org/x/sys/unix Flock
-	// - Windows: Use LockFileEx via syscall
 	// For now, simple implementation using lock files
 
 	lockPath := path + ".lock"
@@ -38,45 +34,46 @@ func UnlockFile(lock *FileLock) error {
 		return nil
 	}
 
-	lock.file.Close()
+	if err := lock.file.Close(); err != nil {
+		return fmt.Errorf("failed to close lock file: %w", err)
+	}
 	return os.Remove(lock.path)
 }
 
 // AtomicWrite writes data atomically by writing to a temp file then renaming
 func AtomicWrite(path string, data []byte) error {
-	// TODO: Implement atomic write
-	// 1. Write to {path}.tmp
-	// 2. Rename to {path} (atomic operation)
-	// 3. This prevents corruption if interrupted
 
 	dir := filepath.Dir(path)
-	tmpFile, err := ioutil.TempFile(dir, ".tmp-*")
+	tmpFile, err := os.CreateTemp(dir, ".tmp-*")
 	if err != nil {
 		return fmt.Errorf("failed to create temp file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
 
+	// Ensure cleanup on error
+	var success bool
+	defer func() {
+		if !success {
+			_ = tmpFile.Close()
+			_ = os.Remove(tmpPath)
+		}
+	}()
+
 	// Write data
-	_, err = tmpFile.Write(data)
-	if err != nil {
-		tmpFile.Close()
-		os.Remove(tmpPath)
+	if _, err = tmpFile.Write(data); err != nil {
 		return fmt.Errorf("failed to write temp file: %w", err)
 	}
 
 	// Close temp file
-	err = tmpFile.Close()
-	if err != nil {
-		os.Remove(tmpPath)
+	if err = tmpFile.Close(); err != nil {
 		return fmt.Errorf("failed to close temp file: %w", err)
 	}
 
 	// Atomic rename
-	err = os.Rename(tmpPath, path)
-	if err != nil {
-		os.Remove(tmpPath)
+	if err = os.Rename(tmpPath, path); err != nil {
 		return fmt.Errorf("failed to rename temp file: %w", err)
 	}
 
+	success = true
 	return nil
 }

@@ -81,7 +81,11 @@ func copyLinux(text string) error {
 		}
 	}
 
-	return fmt.Errorf("no clipboard command available (install xclip, xsel, or wl-clipboard)")
+	return fmt.Errorf("clipboard not available: no clipboard utility found\n" +
+		"Please install one of the following:\n" +
+		"  • X11: 'sudo apt install xclip' or 'sudo apt install xsel'\n" +
+		"  • Wayland: 'sudo apt install wl-clipboard'\n" +
+		"Alternatively, use the export feature to save colors to a file")
 }
 
 // pasteLinux pastes text from clipboard on Linux
@@ -113,7 +117,10 @@ func pasteLinux() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("no clipboard command available (install xclip, xsel, or wl-clipboard)")
+	return "", fmt.Errorf("clipboard not available: no clipboard utility found\n" +
+		"Please install one of the following:\n" +
+		"  • X11: 'sudo apt install xclip' or 'sudo apt install xsel'\n" +
+		"  • Wayland: 'sudo apt install wl-clipboard'")
 }
 
 // copyWindows copies text to clipboard on Windows
