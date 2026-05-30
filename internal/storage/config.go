@@ -18,6 +18,9 @@ type Config struct {
 // GetConfigDir returns the platform-specific config directory
 func GetConfigDir() (string, error) {
 	// Use os.UserConfigDir() with fallback to ~/.config/prism
+	if xdgConfigHome := os.Getenv("XDG_CONFIG_HOME"); xdgConfigHome != "" {
+		return filepath.Join(xdgConfigHome, "prism"), nil
+	}
 
 	configDir, err := os.UserConfigDir()
 	if err != nil {

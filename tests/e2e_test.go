@@ -230,16 +230,16 @@ func TestE2E_ColorModificationWorkflow(t *testing.T) {
 	pal, _ := palette.Generate(vibrant, palette.Analogous)
 	pal.Name = "Lightened Analogous"
 
-	// Check if the modifications improved contrast
-	white, _ := color.ParseHex("#FFFFFF")
-	originalContrast := wcag.CalculateContrast(darkColor, white)
-	modifiedContrast := wcag.CalculateContrast(vibrant, white)
+	// Check if the modifications improved contrast for dark-on-light alternatives.
+	black, _ := color.ParseHex("#000000")
+	originalContrast := wcag.CalculateContrast(darkColor, black)
+	modifiedContrast := wcag.CalculateContrast(vibrant, black)
 
 	t.Logf("Original contrast: %.2f", originalContrast)
 	t.Logf("Modified contrast: %.2f", modifiedContrast)
 
 	if modifiedContrast <= originalContrast {
-		t.Error("Lightening should improve contrast with white")
+		t.Error("Lightening should improve contrast with black")
 	}
 
 	// Export for use

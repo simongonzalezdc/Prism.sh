@@ -41,7 +41,7 @@ func NewSearchModel(tm *theme.Manager) SearchModel {
 
 // Init initializes the search screen
 func (m SearchModel) Init() tea.Cmd {
-	return textinput.Blink
+	return nil
 }
 
 // Update handles search messages
