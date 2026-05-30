@@ -8,7 +8,7 @@ import (
 
 	color "github.com/kyanite/prism/internal/color"
 	palette "github.com/kyanite/prism/internal/palette"
-	)
+)
 
 // TestStorageIntegration tests complete storage workflows
 func TestStorageIntegration(t *testing.T) {
@@ -210,6 +210,30 @@ func TestStorageIntegration(t *testing.T) {
 			<-done
 		}
 	})
+}
+
+func TestGetConfigDirIgnoresRelativeXDGConfigHome(t *testing.T) {
+	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
+	os.Setenv("XDG_CONFIG_HOME", "relative-config")
+	defer func() {
+		if originalConfigDir == "" {
+			os.Unsetenv("XDG_CONFIG_HOME")
+		} else {
+			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
+		}
+	}()
+
+	configDir, err := GetConfigDir()
+	if err != nil {
+		t.Fatalf("GetConfigDir failed: %v", err)
+	}
+
+	if !filepath.IsAbs(configDir) {
+		t.Fatalf("Expected absolute config dir, got %q", configDir)
+	}
+	if filepath.Clean(configDir) == filepath.Join("relative-config", "prism") {
+		t.Fatalf("Expected relative XDG_CONFIG_HOME to be ignored, got %q", configDir)
+	}
 }
 
 // TestStorageErrorHandling tests error conditions
