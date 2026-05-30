@@ -172,5 +172,5 @@ func ValidatePaletteContrast(palette Palette) (minContrast float64, ok bool) {
 
 // generateID creates a unique palette ID
 func generateID() string {
-	return fmt.Sprintf("palette_%s", time.Now().Format("20060102_150405"))
+	return fmt.Sprintf("palette_%d", time.Now().UnixNano())
 }
