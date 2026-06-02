@@ -164,7 +164,9 @@ func TestStorageIntegration(t *testing.T) {
 
 		// Clean up
 		for _, pal := range palettes {
-			DeletePalette(pal.ID)
+			if err := DeletePalette(pal.ID); err != nil {
+				t.Fatalf("DeletePalette cleanup failed: %v", err)
+			}
 		}
 	})
 

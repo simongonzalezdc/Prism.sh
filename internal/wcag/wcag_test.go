@@ -5,16 +5,16 @@ import (
 	"testing"
 
 	color "github.com/kyanite/prism/internal/color"
-	)
+)
 
 func TestWCAGContrast(t *testing.T) {
 	tests := []struct {
-		name       string
-		fg         string
-		bg         string
-		wantRatio  float64
-		wantLevel  string
-		tolerance  float64
+		name      string
+		fg        string
+		bg        string
+		wantRatio float64
+		wantLevel string
+		tolerance float64
 	}{
 		{
 			name:      "White on Black",
@@ -78,16 +78,16 @@ func TestWCAGContrast(t *testing.T) {
 
 func TestWCAGThresholds(t *testing.T) {
 	tests := []struct {
-		ratio       float64
-		wantAASmall bool
-		wantAALarge bool
+		ratio        float64
+		wantAASmall  bool
+		wantAALarge  bool
 		wantAAASmall bool
 		wantAAALarge bool
 	}{
-		{21.0, true, true, true, true},   // Maximum
-		{7.0, true, true, true, true},    // AAA small threshold
-		{4.5, true, true, false, true},   // AA small / AAA large threshold
-		{3.0, false, true, false, false}, // AA large threshold
+		{21.0, true, true, true, true},    // Maximum
+		{7.0, true, true, true, true},     // AAA small threshold
+		{4.5, true, true, false, true},    // AA small / AAA large threshold
+		{3.0, false, true, false, false},  // AA large threshold
 		{1.0, false, false, false, false}, // Minimum (fail all)
 	}
 
@@ -111,9 +111,9 @@ func TestWCAGThresholds(t *testing.T) {
 
 func TestRelativeLuminance(t *testing.T) {
 	tests := []struct {
-		name string
+		name    string
 		r, g, b int
-		want float64
+		want    float64
 	}{
 		{"White", 255, 255, 255, 1.0},
 		{"Black", 0, 0, 0, 0.0},

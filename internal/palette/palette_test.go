@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	color "github.com/kyanite/prism/internal/color"
-	)
+)
 
 func TestPaletteGeneration(t *testing.T) {
 	baseColor := color.NewFromHSL(180, 100, 50) // Cyan

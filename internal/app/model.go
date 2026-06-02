@@ -44,15 +44,15 @@ func NewModel() Model {
 	themeManager := theme.NewManager()
 
 	return Model{
-		CurrentScreen: ScreenMenu,
-		ThemeManager:  themeManager,
-		menuModel:     ui.NewMenuModel(themeManager),
-		wheelModel:    ui.NewWheelModel(themeManager),
+		CurrentScreen:  ScreenMenu,
+		ThemeManager:   themeManager,
+		menuModel:      ui.NewMenuModel(themeManager),
+		wheelModel:     ui.NewWheelModel(themeManager),
 		generatorModel: ui.NewGeneratorModel(themeManager),
-		theoryModel:   ui.NewTheoryModel(themeManager),
-		checkerModel:  ui.NewCheckerModel(themeManager),
-		managerModel:  ui.NewManagerModel(themeManager),
-		searchModel:   ui.NewSearchModel(themeManager),
+		theoryModel:    ui.NewTheoryModel(themeManager),
+		checkerModel:   ui.NewCheckerModel(themeManager),
+		managerModel:   ui.NewManagerModel(themeManager),
+		searchModel:    ui.NewSearchModel(themeManager),
 	}
 }
 

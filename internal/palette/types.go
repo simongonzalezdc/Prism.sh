@@ -12,15 +12,15 @@ import (
 // Palette represents a color palette with metadata and harmony information.
 // It contains a collection of colors generated from a base color using a specific harmony rule.
 type Palette struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	Colors      []color.Color  `json:"colors"`
-	HarmonyRule string         `json:"harmony_rule"`
-	BaseColor   color.Color    `json:"base_color"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	Tags        []string       `json:"tags,omitempty"`
+	ID          string        `json:"id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description,omitempty"`
+	Colors      []color.Color `json:"colors"`
+	HarmonyRule string        `json:"harmony_rule"`
+	BaseColor   color.Color   `json:"base_color"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
+	Tags        []string      `json:"tags,omitempty"`
 }
 
 // HarmonyRule defines color harmony rules

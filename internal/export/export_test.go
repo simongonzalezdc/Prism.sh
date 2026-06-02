@@ -7,7 +7,7 @@ import (
 	"time"
 
 	color "github.com/kyanite/prism/internal/color"
-		palette "github.com/kyanite/prism/internal/palette"
+	palette "github.com/kyanite/prism/internal/palette"
 )
 
 // createTestPalette creates a test palette for export tests
@@ -259,7 +259,9 @@ func TestExportEdgeCases(t *testing.T) {
 		}
 
 		var parsed map[string]interface{}
-		json.Unmarshal(jsonData, &parsed)
+		if err := json.Unmarshal(jsonData, &parsed); err != nil {
+			t.Fatalf("Exported JSON should be valid: %v", err)
+		}
 		colors := parsed["colors"].([]interface{})
 		if len(colors) != 0 {
 			t.Errorf("Empty palette should have 0 colors, got %d", len(colors))

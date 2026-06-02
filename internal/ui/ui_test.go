@@ -6,7 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	palette "github.com/kyanite/prism/internal/palette"
 	theme "github.com/kyanite/prism/internal/theme"
-	)
+)
 
 // TestUIModelInitialization tests UI model creation and initialization
 func TestUIModelInitialization(t *testing.T) {
@@ -141,6 +141,7 @@ func TestUIModelNavigation(t *testing.T) {
 		// Simulate up key
 		msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'k'}}
 		newModel, _ = newModel.Update(msg)
+		_ = newModel
 	})
 
 	t.Run("GeneratorRuleSelection", func(t *testing.T) {
