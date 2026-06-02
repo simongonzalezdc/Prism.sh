@@ -1,0 +1,12 @@
+# Prism.sh
+
+> Experimental shell tools in Go — composable command-line utilities and creative dev workflows.
+
+## What it is
+A Go collection of experimental, composable command-line utilities for creative developer workflows.
+
+## Install / use
+Build from source with Go (`go build ./...`).
+
+## Links
+- Repository: https://github.com/simongonzalezdc/Prism.sh
