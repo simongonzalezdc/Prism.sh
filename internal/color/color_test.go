@@ -3,8 +3,7 @@ package color
 import (
 	"math"
 	"testing"
-
-	)
+)
 
 func TestParseHex(t *testing.T) {
 	tests := []struct {
@@ -18,8 +17,8 @@ func TestParseHex(t *testing.T) {
 		{"#FFFFFF", RGB{R: 255, G: 255, B: 255}, false},
 		{"#000000", RGB{R: 0, G: 0, B: 0}, false},
 		{"FF0000", RGB{R: 255, G: 0, B: 0}, false}, // Without #
-		{"#GGGGGG", RGB{}, true},          // Invalid
-		{"#FFF", RGB{}, true},             // Too short
+		{"#GGGGGG", RGB{}, true},                   // Invalid
+		{"#FFF", RGB{}, true},                      // Too short
 	}
 
 	for _, tt := range tests {

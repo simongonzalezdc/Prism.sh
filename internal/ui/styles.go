@@ -10,10 +10,10 @@ type Styles struct {
 	Theme *theme.Theme
 
 	// Layout
-	Border     lipgloss.Style
-	Title      lipgloss.Style
-	Subtitle   lipgloss.Style
-	StatusBar  lipgloss.Style
+	Border    lipgloss.Style
+	Title     lipgloss.Style
+	Subtitle  lipgloss.Style
+	StatusBar lipgloss.Style
 
 	// Text
 	Primary   lipgloss.Style

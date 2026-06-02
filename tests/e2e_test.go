@@ -25,15 +25,7 @@ func TestE2E_CreateAndExportPalette(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	// Override config directory
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// Step 1: User enters a color
 	userInput := "#FF5733"
@@ -279,7 +271,9 @@ func TestE2E_ThemeCreation(t *testing.T) {
 	pal.Description = "Main application theme"
 
 	// Save the palette
-	storage.SavePalette(pal)
+	if err := storage.SavePalette(pal); err != nil {
+		t.Fatalf("Failed to save palette: %v", err)
+	}
 
 	// Export as theme
 	themeData, err := export.ExportTheme(pal)
@@ -306,12 +300,19 @@ func TestE2E_ThemeCreation(t *testing.T) {
 	// Also export as CSS for web
 	cssData := export.ExportCSS(pal)
 	cssFile := filepath.Join(tmpDir, "theme.css")
-	os.WriteFile(cssFile, []byte(cssData), 0644)
+	if err := os.WriteFile(cssFile, []byte(cssData), 0644); err != nil {
+		t.Fatalf("Failed to write CSS theme: %v", err)
+	}
 
 	// And JSON for config
-	jsonData, _ := export.ExportJSON(pal)
+	jsonData, err := export.ExportJSON(pal)
+	if err != nil {
+		t.Fatalf("Failed to export JSON theme: %v", err)
+	}
 	jsonFile := filepath.Join(tmpDir, "theme.json")
-	os.WriteFile(jsonFile, jsonData, 0644)
+	if err := os.WriteFile(jsonFile, jsonData, 0644); err != nil {
+		t.Fatalf("Failed to write JSON theme: %v", err)
+	}
 
 	// Verify files exist
 	if _, err := os.Stat(cssFile); os.IsNotExist(err) {
@@ -456,24 +457,36 @@ func TestE2E_BulkPaletteManagement(t *testing.T) {
 	}
 
 	// Verify deletion
-	remainingPalettes, _ := storage.ListPalettes()
+	remainingPalettes, err := storage.ListPalettes()
+	if err != nil {
+		t.Fatalf("Failed to list remaining palettes: %v", err)
+	}
 	if len(remainingPalettes) != 2 {
 		t.Errorf("Should have 2 palettes remaining, got %d", len(remainingPalettes))
 	}
 
 	// Export remaining palettes
 	exportDir := filepath.Join(tmpDir, "exports")
-	os.MkdirAll(exportDir, 0755)
+	if err := os.MkdirAll(exportDir, 0755); err != nil {
+		t.Fatalf("Failed to create export dir: %v", err)
+	}
 
 	for _, pal := range remainingPalettes {
 		// Export to multiple formats
-		jsonData, _ := export.ExportJSON(pal)
+		jsonData, err := export.ExportJSON(pal)
+		if err != nil {
+			t.Fatalf("Failed to export palette JSON: %v", err)
+		}
 		jsonFile := filepath.Join(exportDir, pal.ID+".json")
-		os.WriteFile(jsonFile, jsonData, 0644)
+		if err := os.WriteFile(jsonFile, jsonData, 0644); err != nil {
+			t.Fatalf("Failed to write palette JSON: %v", err)
+		}
 
 		cssData := export.ExportCSS(pal)
 		cssFile := filepath.Join(exportDir, pal.ID+".css")
-		os.WriteFile(cssFile, []byte(cssData), 0644)
+		if err := os.WriteFile(cssFile, []byte(cssData), 0644); err != nil {
+			t.Fatalf("Failed to write palette CSS: %v", err)
+		}
 
 		t.Logf("Exported palette %s to multiple formats", pal.Name)
 	}
