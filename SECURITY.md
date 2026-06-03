@@ -18,7 +18,7 @@ If you discover a security vulnerability in Prism.sh, please report it privately
 ### How to Report
 
 1. **Email:** Send details to security@kyanite.sh (if available)
-2. **GitHub Security Advisory:** Use GitHub's [private vulnerability reporting](https://github.com/kyanite/prism/security/advisories/new)
+2. **GitHub Security Advisory:** Use GitHub's [private vulnerability reporting](https://github.com/simongonzalezdc/Prism.sh/security/advisories/new)
 
 ### What to Include
 
@@ -44,10 +44,12 @@ Please include the following information:
 
 ```bash
 # Always verify the source
-go install github.com/kyanite/prism@latest
+git clone https://github.com/simongonzalezdc/Prism.sh.git
+cd Prism.sh
+make build
 
 # Or build from source
-git clone https://github.com/kyanite/prism.git
+git clone https://github.com/simongonzalezdc/Prism.sh.git
 cd prism
 go build -o bin/prism ./cmd/prism
 ```
