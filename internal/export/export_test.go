@@ -104,11 +104,12 @@ func TestExportIntegration(t *testing.T) {
 
 		// Count color variables - should have one for each color
 		for i := range pal.Colors {
-			if i == 0 {
+			switch i {
+			case 0:
 				if !strings.Contains(css, "--color-primary:") {
 					t.Error("CSS should contain primary color")
 				}
-			} else if i == 1 {
+			case 1:
 				if !strings.Contains(css, "--color-secondary:") {
 					t.Error("CSS should contain secondary color")
 				}
