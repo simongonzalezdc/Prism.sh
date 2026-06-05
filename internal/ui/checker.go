@@ -86,13 +86,13 @@ func (m CheckerModel) View() string {
 		Background(lipgloss.Color(m.foreground)).
 		Padding(0, 2).
 		Render("██")
-	b.WriteString(fmt.Sprintf("Foreground: %s %s\n", fgSwatch, m.foreground))
+	fmt.Fprintf(&b, "Foreground: %s %s\n", fgSwatch, m.foreground)
 
 	bgSwatch := lipgloss.NewStyle().
 		Background(lipgloss.Color(m.background)).
 		Padding(0, 2).
 		Render("██")
-	b.WriteString(fmt.Sprintf("Background: %s %s\n", bgSwatch, m.background))
+	fmt.Fprintf(&b, "Background: %s %s\n", bgSwatch, m.background)
 
 	b.WriteString("\n")
 

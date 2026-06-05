@@ -10,6 +10,15 @@ import (
 	palette "github.com/kyanite/prism/internal/palette"
 )
 
+func cleanupTempDir(t *testing.T, path string) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := os.RemoveAll(path); err != nil {
+			t.Errorf("Failed to remove temp dir %s: %v", path, err)
+		}
+	})
+}
+
 // TestStorageIntegration tests complete storage workflows
 func TestStorageIntegration(t *testing.T) {
 	// Create temporary test directory
@@ -17,18 +26,10 @@ func TestStorageIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	cleanupTempDir(t, tmpDir)
 
 	// Override config directory for testing
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	t.Run("ConfigSaveAndLoad", func(t *testing.T) {
 		// Create and save a config
@@ -64,7 +65,9 @@ func TestStorageIntegration(t *testing.T) {
 	t.Run("DefaultConfig", func(t *testing.T) {
 		// Remove config file if it exists
 		configDir, _ := GetConfigDir()
-		os.RemoveAll(configDir)
+		if err := os.RemoveAll(configDir); err != nil {
+			t.Fatalf("Failed to remove config dir: %v", err)
+		}
 
 		// Load config should return default when file doesn't exist
 		cfg, err := LoadConfig()
@@ -129,7 +132,9 @@ func TestStorageIntegration(t *testing.T) {
 		// Clean up any existing palettes
 		configDir, _ := GetConfigDir()
 		palettesDir := filepath.Join(configDir, "palettes")
-		os.RemoveAll(palettesDir)
+		if err := os.RemoveAll(palettesDir); err != nil {
+			t.Fatalf("Failed to remove palettes dir: %v", err)
+		}
 
 		// Create multiple test palettes
 		palettes := []palette.Palette{}
@@ -215,15 +220,7 @@ func TestStorageIntegration(t *testing.T) {
 }
 
 func TestGetConfigDirIgnoresRelativeXDGConfigHome(t *testing.T) {
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", "relative-config")
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	t.Setenv("XDG_CONFIG_HOME", "relative-config")
 
 	configDir, err := GetConfigDir()
 	if err != nil {
@@ -260,18 +257,10 @@ func TestStorageErrorHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create temp dir: %v", err)
 		}
-		defer os.RemoveAll(tmpDir)
+		cleanupTempDir(t, tmpDir)
 
 		// Override config directory
-		originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-		os.Setenv("XDG_CONFIG_HOME", tmpDir)
-		defer func() {
-			if originalConfigDir == "" {
-				os.Unsetenv("XDG_CONFIG_HOME")
-			} else {
-				os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-			}
-		}()
+		t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 		palettes, err := ListPalettes()
 		if err != nil {
@@ -290,17 +279,8 @@ func TestPaletteVersioning(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	cleanupTempDir(t, tmpDir)
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// Create and save a palette
 	baseColor, _ := color.ParseHex("#FF5733")

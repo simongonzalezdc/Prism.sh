@@ -109,11 +109,11 @@ func (m WheelModel) View() string {
 		Padding(1, 4).
 		Render("████")
 	b.WriteString(swatch)
-	b.WriteString(fmt.Sprintf("  %s", currentColor.Hex))
+	fmt.Fprintf(&b, "  %s", currentColor.Hex)
 	b.WriteString("\n")
 
-	b.WriteString(fmt.Sprintf("RGB: (%d, %d, %d)\n", currentColor.RGB.R, currentColor.RGB.G, currentColor.RGB.B))
-	b.WriteString(fmt.Sprintf("HSL: (%.0f°, %.0f%%, %.0f%%)\n", currentColor.HSL.H, currentColor.HSL.S, currentColor.HSL.L))
+	fmt.Fprintf(&b, "RGB: (%d, %d, %d)\n", currentColor.RGB.R, currentColor.RGB.G, currentColor.RGB.B)
+	fmt.Fprintf(&b, "HSL: (%.0f°, %.0f%%, %.0f%%)\n", currentColor.HSL.H, currentColor.HSL.S, currentColor.HSL.L)
 	b.WriteString("\n")
 
 	// Related colors

@@ -15,6 +15,15 @@ import (
 	"github.com/kyanite/prism/internal/wcag"
 )
 
+func cleanupTempDir(t *testing.T, path string) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := os.RemoveAll(path); err != nil {
+			t.Errorf("Failed to remove temp dir %s: %v", path, err)
+		}
+	})
+}
+
 // TestE2E_CreateAndExportPalette tests the complete workflow of creating and exporting a palette
 func TestE2E_CreateAndExportPalette(t *testing.T) {
 	// Setup temporary directory
@@ -22,7 +31,7 @@ func TestE2E_CreateAndExportPalette(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	cleanupTempDir(t, tmpDir)
 
 	// Override config directory
 	t.Setenv("XDG_CONFIG_HOME", tmpDir)
@@ -127,17 +136,8 @@ func TestE2E_CompareMultiplePalettes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	cleanupTempDir(t, tmpDir)
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// User wants to try different harmonies for the same base color
 	baseColor, _ := color.ParseHex("#3498DB") // Nice blue
@@ -249,17 +249,8 @@ func TestE2E_ThemeCreation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	cleanupTempDir(t, tmpDir)
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// User wants to create a complete theme for their app
 	// They start with a brand color
@@ -398,17 +389,8 @@ func TestE2E_BulkPaletteManagement(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	cleanupTempDir(t, tmpDir)
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// Create multiple palettes for a project
 	projectColors := []string{
@@ -510,17 +492,8 @@ func TestE2E_ConfigurationManagement(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	defer func() {
-		if originalConfigDir == "" {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		} else {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		}
-	}()
+	cleanupTempDir(t, tmpDir)
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
 
 	// First time user - should get defaults
 	cfg, err := storage.LoadConfig()
